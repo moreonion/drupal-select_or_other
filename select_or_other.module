@@ -1,0 +1,232 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * The Select (or other) module.
+ */
+
+/**
+ * Implementation of hook_theme().
+ */
+function select_or_other_theme() {
+  return array(
+    'select_or_other' => array(
+      'arguments' => array(
+        'element' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Theme a Select (or other) element.
+ */
+function theme_select_or_other($element) {
+  // Load the JS file to hide/show the 'other' box when needed.
+  drupal_add_js(drupal_get_path('module', 'select_or_other') .'/select_or_other.js');
+  // Prepare a random ID to assign to this instance of the element.
+  $id = md5(uniqid(microtime()));
+  // Wrap the whole element in a span tag that the JS will use to recognise the two form fields are linked.
+  return "<span class='select-or-other' id='select-or-other-". $id ."'>". drupal_render($element) ."</span>";
+}
+
+/**
+ * Implementation of hook_elements().
+ */
+function select_or_other_elements() {
+  $type['select_or_other'] = array(
+    '#input' => TRUE, 
+    '#size' => 0, 
+    '#multiple' => FALSE, 
+    '#process' => array('select_or_other_process'),
+    '#element_validate' => array('select_or_other_element_validate'),
+    '#other' => t('Other'),
+    '#theme' => 'select_or_other',
+  );
+  return $type;
+}
+
+/**
+ * Implementation of form_type_hook_value().
+ */
+function form_type_select_or_other_value($element, $edit = FALSE) {
+  if (func_num_args() == 1) {
+     return $element['#default_value'];
+  }
+}
+
+/**
+ * Process callback for a Select (or other) element.
+ */
+function select_or_other_process($element, $form_state) {
+
+  $element['#tree'] = TRUE;
+  $element['#processed'] = TRUE;
+  unset($element['#type']);
+
+  // Create the main select box
+  // Note that #title, #default_value, #disabled, #multiple, #options, #required, and #size as passed to the select box from the main element.
+  $element['select'] = array(
+    '#type' => 'select',
+    '#process' => array('form_expand_ahah'), // As in system_elements()
+    '#title' => $element['#title'],
+    '#default_value' => (array)$element['#default_value'],   // will need to handle this custom if the default value is not one of the options!!!
+    '#disabled' => $element['#disabled'],
+    '#multiple' => $element['#multiple'],
+    '#required' => $element['#required'],
+    '#size' => $element['#size'],
+    '#options' => $element['#options'],
+    '#weight' => 10,
+  );
+
+  // Unset the default value on the container level so it doesn't get rendered there.
+  unset($element['#value']);
+  // Unset the required parameter so FAPI doesn't force us to fill in the textfield.
+  unset($element['#required']);
+
+  // Now we must handle the default values.
+  $other_default = array();
+
+  $default_value = $element['select']['#default_value'];
+  if (is_string($default_value)) {
+    $default_value = array(
+      $default_value,
+    );
+  }
+  foreach ($default_value as $key => $val) {
+    if (!array_key_exists($val, $element['select']['#options']) && !in_array($val, $element['select']['#options'])) {
+      // Not a valid option - add it to 'other'.
+      if ($element['#other_unknown_defaults'] == 'other') {
+        if ($element['#other_delimiter']) {
+          $other_default[] = $val;
+        }
+        else {
+          $other_default = array($val);
+        }
+      }
+      elseif ($element['#other_unknown_defaults'] == 'append') {
+        $element['select']['#options'][$val] = $val;
+      }
+    }
+  }
+  $other_default_string = '';
+  if (!empty($other_default)) {
+    $other_default_string = implode($element['#other_delimiter'], $other_default);
+    if ($element['select']['#multiple']) {
+      $element['select']['#default_value'][] = 'select_or_other';
+    }
+    else {
+      $element['select']['#default_value'] = 'select_or_other';
+    }
+  }
+
+  // Add in the 'other' option.
+  $element['select']['#options']['select_or_other'] = $element['#other'];
+
+  // Create the 'other' textfield.
+  $element['other'] = array(
+    '#type' => 'textfield',
+    '#weight' => 20,
+    '#default_value' => $other_default_string,
+  );
+
+  // Populate properties set specifically as #select_property or #other_property
+  $sub_elements = array('select', 'other');
+  foreach ($sub_elements as $sub_element) {
+    foreach ($element as $key => $value) {
+      if (strpos($key, '#'. $sub_element .'_') === 0) {
+        $element[$sub_element][str_replace('#'. $sub_element .'_', '#', $key)] = $value;
+      }
+    }
+    // Also add in a custom class for each.
+    if (isset($element[$sub_element]['#attributes']['class'])) {
+      $element[$sub_element]['#attributes']['class'] .= " select-or-other"; 
+    }
+    else {
+      $element[$sub_element]['#attributes']['class'] = "select-or-other"; 
+    }
+  }
+
+  return $element;
+}
+
+/**
+ * Element validate callback for a Select (or other) element.
+ */
+function select_or_other_element_validate($element, &$form_state) {
+  $other_selected = FALSE;
+  if (is_array($element['select']['#value']) && in_array('select_or_other', $element['select']['#value'])) {
+    // This is a multiselect. assoc arrays
+    $other_selected = TRUE;
+    $value = $element['select']['#value'];
+    unset($value['select_or_other']);
+    $value[$element['other']['#value']] = $element['other']['#value'];
+  }
+  else if (is_string($element['select']['#value']) && $element['select']['#value'] == 'select_or_other') {
+    // This is a single select.
+    $other_selected = TRUE;
+    $value = $element['other']['#value'];
+  }
+  else {
+    $value = $element['select']['#value'];
+  }
+  if ($other_selected && !$element['other']['#value']) {
+    form_error($element['other'], t('!title is required', array('!title' => $element['#title'])));
+  }
+  if (isset($value)) {
+    form_set_value($element, $value, $form_state);
+    $form_state['clicked_button']['#post'][$element['#name']] = $value;  // Is this something we should do?
+  }
+  return $element;
+}
+
+/**
+ * Test function.
+
+function select_or_other_form($form_state) {
+  $form['red-_herring'] = array(
+    '#type' => 'value',
+    '#value' => t('Red herring'),
+  );
+  $form['my_field'] = array(
+    '#type' => 'select_or_other',
+    '#title' => t('My example Field'),
+    '#default_value' => array('puckyou'),
+    '#options' => array(
+      'option1' => t('Option 1'),
+      'option2' => t('Option 2'),
+      'option3' => t('Option 3'),
+    ),
+    '#other' => t('Other (please type with your fingers)'),
+    '#required' => TRUE,
+    '#multiple' => FALSE,
+    '#other_delimiter' => ', ', // if this is FALSE only the last value will be used
+    '#other_unknown_defaults' => 'other', // possible values 'append', 'ignore', 'other'  (if other specified you can also override #other_delimiter).
+   );
+   $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+   return $form;
+}
+
+function select_or_other_form_submit($form, $state) {
+  drupal_set_message("state<pre>".print_r($state,true));
+
+} */
+
+/**
+ * Implementation of hook_menu().
+
+function select_or_other_menu() {
+  $items = array();
+
+  $items['test-form'] = array(
+    'title' => t('select_or_other test'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('select_or_other_form'),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+	return $items;
+} */
+
+/* TO DO: radios and checkboxes and shit */
