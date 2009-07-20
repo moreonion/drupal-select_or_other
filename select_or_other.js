@@ -1,7 +1,5 @@
 // $Id$
 
-var other_shown = 0;
-
 function select_or_other_check_and_show(uniqid, speed) {
   var other_selected = 0;
   $("span#"+uniqid+" select.select-or-other option:selected").each(function () {
@@ -9,13 +7,11 @@ function select_or_other_check_and_show(uniqid, speed) {
       other_selected = 1;
     }
   });
-  if (other_selected == 1 && other_shown == 0) {
+  if (other_selected == 1) {
     $("span#"+uniqid+" input.select-or-other").show(speed);
-    other_shown = 1;
   }
-  else if (other_selected == 0 && other_shown == 1) {
+  else if (other_selected == 0) {
     $("span#"+uniqid+" input.select-or-other").hide(speed);
-    other_shown = 0;
   }
 }
 
