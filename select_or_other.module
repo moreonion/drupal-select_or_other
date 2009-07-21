@@ -27,8 +27,8 @@ function theme_select_or_other($element) {
   drupal_add_js(drupal_get_path('module', 'select_or_other') .'/select_or_other.js');
   // Prepare a random ID to assign to this instance of the element.
   $id = md5(uniqid(microtime()));
-  // Wrap the whole element in a span tag that the JS will use to recognise the two form fields are linked.
-  return "<span class='select-or-other' id='select-or-other-". $id ."'>". drupal_render($element) ."</span>";
+  // Wrap the whole element in a div tag that the JS will use to recognise the two form fields are linked.
+  return "<div class='select-or-other' id='select-or-other-". $id ."'>". drupal_render($element) ."</div>";
 }
 
 /**
@@ -36,6 +36,7 @@ function theme_select_or_other($element) {
  */
 function select_or_other_elements() {
   $type['select_or_other'] = array(
+    '#select_type' => 'select',
     '#input' => TRUE, 
     '#size' => 0, 
     '#multiple' => FALSE, 
@@ -68,10 +69,10 @@ function select_or_other_process($element, $form_state) {
   // Create the main select box
   // Note that #title, #default_value, #disabled, #multiple, #options, #required, and #size as passed to the select box from the main element.
   $element['select'] = array(
-    '#type' => 'select',
-    '#process' => array('form_expand_ahah'), // As in system_elements()
+    '#type' => $element['#select_type'],
+   // '#process' => ($element['#select_type'] == 'radios') ? array('expand_radios') : array('form_expand_ahah'), // As in system_elements()
     '#title' => $element['#title'],
-    '#default_value' => (array)$element['#default_value'],   // will need to handle this custom if the default value is not one of the options!!!
+    '#default_value' => $element['#default_value'],   // will need to handle this custom if the default value is not one of the options!!!
     '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
     '#required' => $element['#required'],
@@ -89,13 +90,13 @@ function select_or_other_process($element, $form_state) {
   $other_default = array();
 
   $default_value = $element['select']['#default_value'];
-  if (is_string($default_value)) {
+  if (!is_array($default_value)) {
     $default_value = array(
       $default_value,
     );
   }
   foreach ($default_value as $key => $val) {
-    if (!array_key_exists($val, $element['select']['#options']) && !in_array($val, $element['select']['#options'])) {
+    if ($val && !array_key_exists($val, $element['select']['#options']) && !in_array($val, $element['select']['#options'])) {
       // Not a valid option - add it to 'other'.
       if ($element['#other_unknown_defaults'] == 'other') {
         if ($element['#other_delimiter']) {
@@ -113,7 +114,7 @@ function select_or_other_process($element, $form_state) {
   $other_default_string = '';
   if (!empty($other_default)) {
     $other_default_string = implode($element['#other_delimiter'], $other_default);
-    if ($element['select']['#multiple']) {
+    if (is_array($element['select']['#default_value'])) {
       $element['select']['#default_value'][] = 'select_or_other';
     }
     else {
@@ -141,10 +142,10 @@ function select_or_other_process($element, $form_state) {
     }
     // Also add in a custom class for each.
     if (isset($element[$sub_element]['#attributes']['class'])) {
-      $element[$sub_element]['#attributes']['class'] .= " select-or-other"; 
+      $element[$sub_element]['#attributes']['class'] .= " select-or-other-". $sub_element; 
     }
     else {
-      $element[$sub_element]['#attributes']['class'] = "select-or-other"; 
+      $element[$sub_element]['#attributes']['class'] = "select-or-other-". $sub_element; 
     }
   }
 
@@ -183,16 +184,14 @@ function select_or_other_element_validate($element, &$form_state) {
 
 /**
  * Test function.
-
-function select_or_other_form($form_state) {
-  $form['red-_herring'] = array(
-    '#type' => 'value',
-    '#value' => t('Red herring'),
-  );
-  $form['my_field'] = array(
+ * to view, visit http://example.com/?q=select-or-other-test-form
+ */
+function select_or_other_test_form($form_state) {
+  $v = &$form_state['values'];
+  $form['my_field_1'] = array(
     '#type' => 'select_or_other',
     '#title' => t('My example Field'),
-    '#default_value' => array('puckyou'),
+    '#default_value' => $v['my_field_1'] ? $v['my_field_1'] : array('Another value'),
     '#options' => array(
       'option1' => t('Option 1'),
       'option2' => t('Option 2'),
@@ -203,30 +202,43 @@ function select_or_other_form($form_state) {
     '#multiple' => FALSE,
     '#other_delimiter' => ', ', // if this is FALSE only the last value will be used
     '#other_unknown_defaults' => 'other', // possible values 'append', 'ignore', 'other'  (if other specified you can also override #other_delimiter).
-   );
-   $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
-   return $form;
+  );
+  $form['my_field_2'] = array(
+    '#type' => 'select_or_other',
+    '#select_type' => 'checkboxes',
+    '#title' => t('My checkboxes example'),
+    '#default_value' => $v['my_field_2'] ? $v['my_field_2'] : array('Another value'),
+    '#options' => array(
+      'option1' => t('Option 1'),
+      'option2' => t('Option 2'),
+      'option3' => t('Option 3'),
+    ),
+    '#other' => t('Other (please type with your fingers)'),
+    '#required' => TRUE,
+    '#multiple' => TRUE, // this should be ignored for checkboxes
+    '#other_delimiter' => ', ', // if this is FALSE only the last value will be used
+    '#other_unknown_defaults' => 'append', // possible values 'append', 'ignore', 'other'  (if other specified you can also override #other_delimiter).
+  );
+  $form['submit'] = array('#type' => 'submit', '#value' => t('Save'));
+  return $form;
 }
 
-function select_or_other_form_submit($form, $state) {
-  drupal_set_message("state<pre>".print_r($state,true));
-
-} */
+function select_or_other_test_form_submit($form, &$state) {
+  // drupal_set_message("state<pre>".print_r($state,true));
+  $state['storage'] = $state['values'];
+}
 
 /**
  * Implementation of hook_menu().
-
+ */
 function select_or_other_menu() {
   $items = array();
-
-  $items['test-form'] = array(
+  $items['select-or-other-test-form'] = array(
     'title' => t('select_or_other test'),
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('select_or_other_form'),
+    'page arguments' => array('select_or_other_test_form'),
     'access callback' => TRUE,
     'type' => MENU_CALLBACK,
   );
-	return $items;
-} */
-
-/* TO DO: radios and checkboxes and shit */
+  return $items;
+}
