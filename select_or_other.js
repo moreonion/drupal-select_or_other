@@ -17,10 +17,9 @@ function select_or_other_check_and_show(uniqid, speed) {
 
 $(document).ready(function() {
   $("input.select-or-other-other").each(function () {
-    $(this).hide(0);
     select_or_other_check_and_show($(this).parents("div.select-or-other").attr("id"), 0);
   });
-  $(".select-or-other-select").change(function () { 
+  $(".select-or-other-select").click(function () { 
     select_or_other_check_and_show($(this).parents("div.select-or-other").attr("id"), 'normal');
   });
 });
