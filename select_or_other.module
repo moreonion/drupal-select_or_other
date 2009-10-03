@@ -67,17 +67,18 @@ function select_or_other_process($element, $form_state) {
   unset($element['#type']);
 
   // Create the main select box
-  // Note that #title, #default_value, #disabled, #multiple, #options, #required, and #size as passed to the select box from the main element.
+  // Note that #title, #default_value, #disabled, #multiple, #options, #attributes, #required, and #size as passed to the select box from the main element.
   $element['select'] = array(
     '#type' => $element['#select_type'],
    // '#process' => ($element['#select_type'] == 'radios') ? array('expand_radios') : array('form_expand_ahah'), // As in system_elements()
     '#title' => $element['#title'],
-    '#default_value' => $element['#default_value'],   // will need to handle this custom if the default value is not one of the options!!!
+    '#default_value' => $element['#default_value'], // will need to handle this custom if the default value is not one of the options!!!
     '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
     '#required' => $element['#required'],
     '#size' => $element['#size'],
     '#options' => $element['#options'],
+    '#attributes' => $element['#attributes'],
     '#weight' => 10,
   );
 
@@ -130,6 +131,8 @@ function select_or_other_process($element, $form_state) {
     '#type' => 'textfield',
     '#weight' => 20,
     '#default_value' => $other_default_string,
+    '#disabled' => $element['#disabled'],
+    '#attributes' => $element['#attributes'],
   );
 
   // Populate properties set specifically as #select_property or #other_property
