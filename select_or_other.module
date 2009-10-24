@@ -60,7 +60,9 @@ function form_type_select_or_other_value($element, $edit = FALSE) {
 /**
  * Process callback for a Select (or other) element.
  */
-function select_or_other_process($element, $form_state) {
+function select_or_other_process($element, $edit, &$form_state, $form) {
+  $field = $form['#field_info'][$element['#field_name']];
+  $delta = $element['#delta'];
 
   $element['#tree'] = TRUE;
   $element['#processed'] = TRUE;
@@ -97,7 +99,11 @@ function select_or_other_process($element, $form_state) {
     );
   }
   foreach ($default_value as $key => $val) {
-    if ($val && !array_key_exists($val, $element['select']['#options']) && !in_array($val, $element['select']['#options'])) {
+    if ($val 
+        && isset($element['select']['#options']) 
+        && is_array($element['select']['#options']) 
+        && !array_key_exists($val, $element['select']['#options']) 
+        && !in_array($val, $element['select']['#options'])) {
       // Not a valid option - add it to 'other'.
       if ($element['#other_unknown_defaults'] == 'other') {
         if ($element['#other_delimiter']) {
@@ -188,6 +194,7 @@ function select_or_other_element_validate($element, &$form_state) {
 /**
  * Test function.
  * to view, visit http://example.com/?q=select-or-other-test-form
+ * You must have the permission 'access administration pages'.
  */
 function select_or_other_test_form($form_state) {
   $v = &$form_state['values'];
@@ -226,9 +233,9 @@ function select_or_other_test_form($form_state) {
   return $form;
 }
 
-function select_or_other_test_form_submit($form, &$state) {
-  // drupal_set_message("state<pre>".print_r($state,true));
-  $state['storage'] = $state['values'];
+function select_or_other_test_form_submit($form, &$form_state) {
+  // drupal_set_message("form_state<pre>".print_r($form_state,true));
+  $form_state['storage'] = $form_state['values'];
 }
 
 /**
@@ -240,8 +247,110 @@ function select_or_other_menu() {
     'title' => t('select_or_other test'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('select_or_other_test_form'),
-    'access callback' => TRUE,
+    'access arguments' => array('access administration pages'),
     'type' => MENU_CALLBACK,
   );
   return $items;
+}
+
+/**
+ * Implementation of hook_widget_info().
+ *
+ * This is a CCK hook.
+ */
+function select_or_other_widget_info() {
+  return array(
+    'select_or_other' => array(
+      'label' => t('Select (or other)'),
+      'field types' => array('text', 'number_integer', 'number_decimal', 'number_float'),
+      'multiple values' => CONTENT_HANDLE_MODULE,
+      'callbacks' => array(
+        'default value' => CONTENT_CALLBACK_DEFAULT,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implementation of hook_widget().
+ *
+ * This is a CCK hook.
+ */
+function select_or_other_widget(&$form, &$form_state, $field, $items, $delta = NULL) {
+  // Prepare the available options using CCK's allowed values functionality.
+  $field['allowed_values'] = isset($field['widget']['available_values']) ? $field['widget']['available_values'] : '';
+  $options = content_allowed_values($field);
+
+  // Construct the element.
+  $element = array(
+    '#type' => $field['widget']['type'],
+    '#other' => isset($field['widget']['other']) ? $field['widget']['other'] : t('Other'),
+    '#default_value' => isset($items) ? $items : array(),
+    '#options' => $options,
+    '#select_type' => isset($field['widget']['select_type']) ? $field['widget']['select_type'] : 'select',
+    '#description' => isset($field['widget']['description']) ? $field['widget']['description'] : '',
+    '#other_delimiter' => isset($field['widget']['other_delimiter']) ? ($field['widget']['other_delimiter'] == 'FALSE' ? FALSE : $field['widget']['other_delimiter']) : '',
+    '#multiple' => $field['multiple'],
+  );
+  return $element;
+}
+
+/**
+ * Implementation of hook_widget_settings().
+ *
+ * This is a CCK hook.
+ */
+function select_or_other_widget_settings($op, $widget) {
+  switch ($op) {
+    case 'form':
+      $form = array();
+      $form['available_values'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Available values'),
+        '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.'),
+        '#default_value' => isset($widget['available_values']) ? $widget['available_values'] : '',
+      );
+      $form['other'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Other description'),
+        '#description' => t('Text that the user will choose when they want to supply an other value.'),
+        '#default_value' => isset($widget['other']) ? $widget['other'] : t('Other'),
+        '#required' => TRUE,
+      );
+      $form['select_type'] = array(
+        '#type' => 'select',
+        '#title' => t('Select Type'),
+        '#description' => t('What type of select input will be used.'),
+        '#options' => array(
+          'select' => t('Select'),
+          'radios' => t('Radios'),
+          'checkboxes' => t('Checkboxes'),
+        ),
+        '#default_value' => isset($widget['select_type']) ? $widget['select_type'] : 'select',
+        '#required' => TRUE,
+      );
+      $form['other_unknown_defaults'] = array(
+        '#type' => 'select',
+        '#title' => t('Unknown defaults'),
+        '#description' => t("If the default value is unknown (not a valid option), what should we do?"),
+        '#options' => array(
+          'append' => t('Append unknown default values to the options'),
+          'ignore' => t('Ignore unknown default values'),
+          'other' => t('Add unknown default values to the <em>other</em> textfield.'),
+        ),
+        '#default_value' => isset($widget['other_unknown_defaults']) ? $widget['other_unknown_defaults'] : 'append',
+        '#required' => TRUE,
+      );
+      $form['other_delimiter'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Other delimiter'),
+        '#description' => t("Delimiter string to delimit multiple 'other' values into the <em>other</em> textfield.  If you enter <em>FALSE</em> only the last value will be used."),
+        '#default_value' => isset($widget['other_delimiter']) ? $widget['other_delimiter'] : ', ',
+        '#required' => TRUE,
+      );
+      return $form;
+
+    case 'save':
+      return array('available_values', 'other', 'select_type');
+  }
 }
