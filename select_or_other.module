@@ -25,10 +25,8 @@ function select_or_other_theme() {
 function theme_select_or_other($element) {
   // Load the JS file to hide/show the 'other' box when needed.
   drupal_add_js(drupal_get_path('module', 'select_or_other') .'/select_or_other.js');
-  // Prepare a random ID to assign to this instance of the element.
-  $id = md5(uniqid(microtime()));
-  // Wrap the whole element in a div tag that the JS will use to recognise the two form fields are linked.
-  return "<div class='select-or-other' id='select-or-other-". $id ."'>". drupal_render($element) ."</div>";
+  // Wrap the whole element in a div tag that the JS will use to recognize the two form fields are linked.
+  return '<div class="select-or-other">'. drupal_render($element) .'</div>';
 }
 
 /**
@@ -37,9 +35,10 @@ function theme_select_or_other($element) {
 function select_or_other_elements() {
   $type['select_or_other'] = array(
     '#select_type' => 'select',
-    '#input' => TRUE, 
-    '#size' => 0, 
-    '#multiple' => FALSE, 
+    '#input' => TRUE,
+    '#size' => 0,
+    '#multiple' => FALSE,
+    '#disabled' => FALSE,
     '#process' => array('select_or_other_process'),
     '#element_validate' => array('select_or_other_element_validate'),
     '#other' => t('Other'),
@@ -61,8 +60,6 @@ function form_type_select_or_other_value($element, $edit = FALSE) {
  * Process callback for a Select (or other) element.
  */
 function select_or_other_process($element, $edit, &$form_state, $form) {
-  $field = $form['#field_info'][$element['#field_name']];
-  $delta = $element['#delta'];
 
   $element['#tree'] = TRUE;
   $element['#processed'] = TRUE;
@@ -84,10 +81,10 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
     '#weight' => 10,
   );
 
-  // Unset the default value on the container level so it doesn't get rendered there.
-  unset($element['#value']);
-  // Unset the required parameter so FAPI doesn't force us to fill in the textfield.
-  unset($element['#required']);
+  // Remove the default value on the container level so it doesn't get rendered there.
+  $element['#value'] = NULL;
+  // Remove the required parameter so FAPI doesn't force us to fill in the textfield.
+  $element['#required'] = NULL;
 
   // Now we must handle the default values.
   $other_default = array();
