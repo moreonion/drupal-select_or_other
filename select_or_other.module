@@ -39,6 +39,7 @@ function select_or_other_elements() {
     '#size' => 0,
     '#multiple' => FALSE,
     '#disabled' => FALSE,
+    '#default_value' => NULL,
     '#process' => array('select_or_other_process'),
     '#element_validate' => array('select_or_other_element_validate'),
     '#other' => t('Other'),
