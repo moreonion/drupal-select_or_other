@@ -313,6 +313,8 @@ function select_or_other_widget_info() {
  */
 function select_or_other_widget(&$form, &$form_state, $field, $items, $delta = NULL) {
 
+  $options = array();
+
   // Create options - similar to code from content_allowed_values().
   $list = explode("\n", $field['widget']['available_options']);
   $list = array_map('trim', $list);
