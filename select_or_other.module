@@ -97,6 +97,8 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
   $element['#value'] = NULL;
   // Remove the required parameter so FAPI doesn't force us to fill in the textfield.
   $element['#required'] = NULL;
+  // Allows other modules to update the #title_display options.
+  $element['#pre_render'] = array('_select_or_other_title_display');
 
   // Now we must handle the default values.
   $other_default = array();
@@ -110,10 +112,10 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
 
   // Process the default value.
   foreach ($element['select']['#default_value'] as $key => $val) {
-    if ($val 
-        && isset($element['select']['#options']) 
-        && is_array($element['select']['#options']) 
-        && !array_key_exists($val, $element['select']['#options']) 
+    if ($val
+        && isset($element['select']['#options'])
+        && is_array($element['select']['#options'])
+        && !array_key_exists($val, $element['select']['#options'])
         && !in_array($val, $element['select']['#options'])) {
       // Not a valid option - add it to 'other'.
       if ($element['#other_unknown_defaults'] == 'other') {
@@ -171,11 +173,26 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
     }
     // Also add in a custom class for each.
     if (isset($element[$sub_element]['#attributes']['class'])) {
-      $element[$sub_element]['#attributes']['class'] .= " select-or-other-". $sub_element; 
+      $element[$sub_element]['#attributes']['class'] .= " select-or-other-". $sub_element;
     }
     else {
-      $element[$sub_element]['#attributes']['class'] = "select-or-other-". $sub_element; 
+      $element[$sub_element]['#attributes']['class'] = "select-or-other-". $sub_element;
     }
+  }
+  return $element;
+}
+
+/**
+ * Mimics Drupal 7 #title_display attribute, which removes the #title
+ * attribute. Using the #pre_render callback ensures that the #title
+ * attribute is still available during validation.
+ *
+ * Please revert the patch at http://drupal.org/node/740522 when upgrading to
+ * Drupal 7.
+ */
+function _select_or_other_title_display($element) {
+  if (isset($element['#title_display']) && $element['#title_display'] === 'none') {
+    $element['select']['#title'] = NULL;
   }
   return $element;
 }

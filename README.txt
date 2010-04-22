@@ -28,3 +28,5 @@ Instructions available on project page.
 EXAMPLE
 -------
 Visit path 'select-or-other-test-form' on your site.
+For example: http://www.example.com/select-or-other-test-form
+NOTE: You must have the permission to 'access administration pages'.
