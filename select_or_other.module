@@ -520,3 +520,17 @@ function theme_select_or_other_none($field) {
       return '';
   }
 }
+
+/**
+ * Implementation of hook_apachesolr_cck_fields_alter().
+ *
+ * Integrate with apachesolr.module. Index select_or_other_fields for faceting.
+ */
+function select_or_other_apachesolr_cck_fields_alter(&$mappings) {
+  $mappings['text']['select_or_other_buttons'] = array(
+    'display_callback' => 'apachesolr_cck_text_field_callback',
+    'indexing_callback' => 'apachesolr_cck_text_indexing_callback',
+    'index_type' => 'string',
+    'facets' => TRUE,
+  );
+}

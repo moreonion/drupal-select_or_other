@@ -1,3 +1,7 @@
+$Id$
+
+Select (or other) README
+
 CONTENTS OF THIS FILE
 ----------------------
 
@@ -17,7 +21,8 @@ Project page: http://drupal.org/project/select_or_other.
 INSTALLATION
 ------------
 1. Copy select_or_other folder to modules directory.
-2. At admin/build/modules enable the select_or_other module.
+   Usually sites/all/modules
+2. At admin/build/modules enable the Select (or other) module.
 
 
 USAGE
