@@ -9,10 +9,10 @@ function select_or_other_check_and_show(ele, page_init) {
     ele = $(ele).parents(".select-or-other")[0];
   }
   if ($(ele).find(".select-or-other-select option:selected[value=select_or_other], .select-or-other-select:checked[value=select_or_other]").length) {
-    $(ele).find(".select-or-other-other").show(speed);
+    $(ele).find(".select-or-other-other").parent("div.form-item").show(speed);
   }
   else {
-    $(ele).find(".select-or-other-other").hide(speed);
+    $(ele).find(".select-or-other-other").parent("div.form-item").hide(speed);
   }
 }
 
@@ -24,9 +24,10 @@ Drupal.behaviors.select_or_other = function(context) {
     .addClass('select-or-other-processed').each(function () {
     select_or_other_check_and_show(this, true);
   });
-  $(".select-or-other-select:not('.select-or-other-processed')", context)
-    .addClass('select-or-other-processed').click(function () {
+  $(".select-or-other-select", context).not("select").click(function () {
+    select_or_other_check_and_show(this, false);
+  });
+  $("select.select-or-other-select", context).change(function () {
     select_or_other_check_and_show(this, false);
   });
 };
-
