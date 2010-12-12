@@ -13,6 +13,12 @@ function select_or_other_check_and_show(ele, page_init) {
   }
   else {
     $(ele).find(".select-or-other-other").parent("div.form-item").hide(speed);
+    if (page_init)
+    {
+      // Special case, when the page is loaded, also apply 'display: none' in case it is
+      // nested inside an element also hidden by jquery - such as a collapsed fieldset.
+      $(ele).find(".select-or-other-other").parent("div.form-item").css("display", "none");
+    }
   }
 }
 
@@ -24,9 +30,11 @@ Drupal.behaviors.select_or_other = function(context) {
     .addClass('select-or-other-processed').each(function () {
     select_or_other_check_and_show(this, true);
   });
+  // Use the click function for radios and checkboxes.
   $(".select-or-other-select", context).not("select").click(function () {
     select_or_other_check_and_show(this, false);
   });
+  // Use the change function for selects.
   $("select.select-or-other-select", context).change(function () {
     select_or_other_check_and_show(this, false);
   });
