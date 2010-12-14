@@ -343,7 +343,7 @@ function select_or_other_widget(&$form, &$form_state, $field, $items, $delta = N
   // Create options - similar to code from content_allowed_values().
   $list = explode("\n", $field['widget']['available_options']);
 
-  if (isset($field['widget']['available_options_php'])) {
+  if (!empty($field['widget']['available_options_php'])) {
     ob_start();
     $list = eval($field['widget']['available_options_php']);
     ob_end_clean();
@@ -487,6 +487,12 @@ function select_or_other_widget_settings($op, $widget) {
       );
       */
       return $form;
+
+    case 'validate':
+      if (empty($widget['available_options']) && empty($widget['available_options_php'])) {
+        form_set_error('available_options', t('You must provide <em>Available options</em>.'));
+      }
+      break;
 
     case 'save':
       return array('available_options', 'available_options_php', 'other', 'other_unknown_defaults', /*'other_delimiter'*/);
