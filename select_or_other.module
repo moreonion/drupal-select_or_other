@@ -257,7 +257,14 @@ function select_or_other_test_form($form_state) {
     '#other_unknown_defaults' => 'other', // possible values 'append', 'ignore', 'other'  (if other specified you can also override #other_delimiter).
     '#description' => t("The description of this element."),
   );
-  $form['my_field_2'] = array(
+  $form['fieldset'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Fieldset'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+
+  );
+  $form['fieldset']['my_field_2'] = array(
     '#type' => 'select_or_other',
     '#select_type' => 'checkboxes',
     '#title' => t('My checkboxes example'),
