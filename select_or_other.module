@@ -577,21 +577,21 @@ function theme_select_or_other_none($field) {
  *
  * Integrate with CCK for properly displaying key|value options.
  */
-function select_or_other_content_allowed_values_alter( &$allowed_values, $field ) {
+function select_or_other_content_allowed_values_alter(&$allowed_values, $field) {
   // Test the operation to avoid validation error with text field valudation on saving
   if ($field['widget']['module'] == 'select_or_other' && $_POST['op'] != t('Save')) {
     $list = explode("\n", $field['widget']['available_options']);
     $list = array_map('trim', $list);
     $list = array_filter($list, 'strlen');
-    foreach ( $list as $opt ) {
+    foreach ($list as $option) {
       // Sanitize the user input with a permissive filter.
-      $opt = content_filter_xss($opt);
-      if (strpos($opt, '|') !== FALSE) {
-        list($key, $value) = explode('|', $opt);
+      $option = content_filter_xss($option);
+      if (strpos($option, '|') !== FALSE) {
+        list($key, $value) = explode('|', $option);
         $allowed_values[$key] = (isset($value) && $value !== '') ? $value : $key;
       }
       else {
-        $allowed_values[$opt] = $opt;
+        $allowed_values[$option] = $option;
       }
     }
   }
