@@ -1,4 +1,3 @@
-// $Id$
 
 function select_or_other_check_and_show(ele, page_init) {
   var speed;

@@ -1,4 +1,3 @@
-$Id$
 
 Select (or other) README
 

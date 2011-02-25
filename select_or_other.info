@@ -1,4 +1,3 @@
-; $Id$
 name = Select (or other)
 description = "Provides a select box form element with additional option 'Other' to give a textfield."
 core = 6.x
