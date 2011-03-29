@@ -94,7 +94,7 @@ function select_or_other_element_process($element, &$form_state) {
 
   $element['select'] = array(
     '#type' => $element['#select_type'],
-    '#title' => NULL,
+    '#title' => $element['#title'],
     '#default_value' => $element['#default_value'],
     '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
@@ -132,10 +132,10 @@ function select_or_other_element_process($element, &$form_state) {
   foreach ($element['select']['#default_value'] as $key => $val) {
 
     if ($val
-         && isset($element['select']['#options'])
-         && is_array($element['select']['#options'])
-         && !array_key_exists($val, $element['select']['#options'])
-         && !in_array($val, $element['select']['#options'])) {
+      && isset($element['select']['#options'])
+      && is_array($element['select']['#options'])
+      && !array_key_exists($val, $element['select']['#options'])
+      && !in_array($val, $element['select']['#options'])) {
 
       // Not a valid option - add it to 'other'.
       if ($element['#other_unknown_defaults'] == 'other') {

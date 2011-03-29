@@ -96,6 +96,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
   // Construct the element.
   $element = array(
     '#type' => 'select_or_other',
+    '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['other']) ? $instance['widget']['other'] : t('Other'),
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
     '#options' => $options,

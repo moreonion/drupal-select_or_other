@@ -22,7 +22,7 @@
       {
         // Special case, when the page is loaded, also apply 'display: none' in case it is
         // nested inside an element also hidden by jquery - such as a collapsed fieldset.
-        jQuery(ele).find(".select-or-other-other").parent("div.select-or-other-other").css("display", "none");
+        jQuery(ele).find(".select-or-other-other").parent("div.form-item").css("display", "none");
       }
     }
   }

@@ -64,6 +64,8 @@ function select_or_other_test_form($form, $form_state) {
     '#multiple' => TRUE, // this should be ignored for checkboxes
     '#other_delimiter' => ', ', // if this is FALSE only the last value will be used
     '#other_unknown_defaults' => 'append', // possible values 'append', 'ignore', 'other'  (if other specified you can also override #other_delimiter).
+    '#other_title' => t('Other'),
+    '#other_description' => t('Description of other field.'),
   );
   $form['submit'] = array(
     '#type' => 'submit',
