@@ -123,7 +123,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
       break;
 
     case 'select_or_other_buttons':
-      $element['#select_type'] = $instance['multiple'] ? 'checkboxes' : 'radios';
+      $element['#select_type'] = (isset($instance['multiple']) && $instance['multiple']) ? 'checkboxes' : 'radios';
       break;
   }
 
