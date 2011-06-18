@@ -56,6 +56,9 @@ function select_or_other_elements() {
     '#other' => t('Other'),
     '#theme' => 'select_or_other',
   );
+  $type['checkboxes'] = array(
+    '#process' => array('select_or_other_expand_checkboxes'),
+  );
   return $type;
 }
 
@@ -99,9 +102,10 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
 
   );
 
-  // If working with checkboxes, set our own process function to handle them.
+  // If working with checkboxes, create a property so we can identify it in a 
+  // process function.
   if ($element['#select_type'] == 'checkboxes') {
-    $element['select']['#process'] = array('select_or_other_expand_checkboxes');
+    $element['select']['#select_or_other_checkboxes'] = TRUE;
   }
 
   // Remove the default value on the container level so it doesn't get rendered there.
@@ -212,12 +216,13 @@ function _select_or_other_title_display($element) {
  * Element process callback for Select (or other) checkboxes.
  */
 function select_or_other_expand_checkboxes($element) {
-  $element = expand_checkboxes($element);
-  foreach (element_children($element) as $key) {
-    $element[$key]['#return_value'] = check_plain($element[$key]['#return_value']);
-    $element[$key]['#name'] = $element['#name'] . '[' . $element[$key]['#return_value'] . ']';
-    $element[$key]['#value_callback'] = 'select_or_other_checkbox_value';
-    $element[$key]['#pre_render'][] = 'select_or_other_checkbox_prerender';
+  if ($element['#select_or_other_checkboxes']) {
+    foreach (element_children($element) as $key) {
+      $element[$key]['#return_value'] = check_plain($element[$key]['#return_value']);
+      $element[$key]['#name'] = $element['#name'] . '[' . $element[$key]['#return_value'] . ']';
+      $element[$key]['#value_callback'] = 'select_or_other_checkbox_value';
+      $element[$key]['#pre_render'][] = 'select_or_other_checkbox_prerender';
+    }
   }
   return $element;
 }
