@@ -10,10 +10,9 @@
  */
 function select_or_other_field_widget_info() {
   $field_types = array(
-    'text',
-    'number_integer',
-    'number_decimal',
-    'number_float',
+    'list_float',
+    'list_integer',
+    'list_text',
   );
   $settings = array(
     'available_options' => '',
