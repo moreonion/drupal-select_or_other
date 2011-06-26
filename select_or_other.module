@@ -24,6 +24,7 @@ function select_or_other_theme() {
     'select_or_other_none' => array(
       'variables' => array(
         'field' => NULL,
+        'instance' => NULL,
       ),
     ),
   );
@@ -242,8 +243,8 @@ function select_or_other_element_validate($element, &$form_state) {
  * The default theme will display N/A for a radio list and blank for a select.
  */
 function theme_select_or_other_none($variables) {
-  $field = $variables['field'];
-  switch ($field['widget']['type']) {
+  $instance = $variables['instance'];
+  switch ($instance['widget']['type']) {
     case 'select_or_other_buttons':
       return t('N/A');
     case 'select_or_other':

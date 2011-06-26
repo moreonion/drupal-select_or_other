@@ -86,10 +86,10 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
 
   // Add a 'none' option for non-required single selects, sort selects, and radios
   if (!isset($instance['required']) || !$instance['required']) {
-    if (($instance['widget']['type'] == 'select_or_other_buttons' && (!isset($instance['multiple']) || !$instance['multiple']))
-      || ($instance['widget']['type'] == 'select_or_other' && (!isset($instance['multiple']) || !$instance['multiple']))
+    if (($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
+      || ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
       || ($instance['widget']['type'] == 'select_or_other_sort')) {
-      $options = array('' => theme('select_or_other_none', array('field' => $instance))) + $options;
+      $options = array('' => theme('select_or_other_none', array('field' => $field, 'instance' => $instance))) + $options;
     }
   }
 
@@ -101,7 +101,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
     '#options' => $options,
     '#description' => isset($instance['widget']['description']) ? $instance['widget']['description'] : '',
-    '#multiple' => isset($instance['multiple']) ? $instance['multiple'] : FALSE,
+    '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
     '#required' => $instance['required'],
     //'#other_delimiter' => $field['widget']['other_delimiter'] == 'FALSE' ? FALSE : $field['widget']['other_delimiter'],
     '#other_delimiter' => FALSE,
@@ -123,7 +123,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
       break;
 
     case 'select_or_other_buttons':
-      $element['#select_type'] = (isset($instance['multiple']) && $instance['multiple']) ? 'checkboxes' : 'radios';
+      $element['#select_type'] = $field['cardinality'] == 1 ? 'radios' : 'checkboxes';
       break;
   }
 
