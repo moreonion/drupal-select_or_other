@@ -93,19 +93,21 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     }
   }
 
+  dpm($instance);
+
   // Construct the element.
   $element = array(
     '#type' => 'select_or_other',
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
-    '#other' => isset($instance['widget']['other']) ? $instance['widget']['other'] : t('Other'),
+    '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
     '#options' => $options,
-    '#description' => isset($instance['widget']['description']) ? $instance['widget']['description'] : '',
+    '#description' => isset($instance['description']) ? $instance['description'] : '',
     '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
     '#required' => $instance['required'],
-    //'#other_delimiter' => $field['widget']['other_delimiter'] == 'FALSE' ? FALSE : $field['widget']['other_delimiter'],
+    //'#other_delimiter' => $field['widget']['settings']['other_delimiter'] == 'FALSE' ? FALSE : $field['widget']['settings']['other_delimiter'],
     '#other_delimiter' => FALSE,
-    '#other_unknown_defaults' => isset($instance['widget']['other_unknown_defaults']) ? $instance['widget']['other_unknown_defaults'] : 'other',
+    '#other_unknown_defaults' => isset($instance['widget']['settings']['other_unknown_defaults']) ? $instance['widget']['settings']['other_unknown_defaults'] : 'other',
     '#element_validate' => array('select_or_other_field_widget_validate'),
     '#field_widget' => $instance['widget']['type'],
   );
