@@ -26,7 +26,12 @@ INSTALLATION
 
 USAGE
 ------------
-Instructions available on project page.
+Field API integration is available for Boolean, Decimal, Float, and Text field
+types.
+
+Webform integration is built into Webform 3.
+
+Custom Forms API usage instructions available on project page.
 
 
 EXAMPLE
