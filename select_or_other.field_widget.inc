@@ -93,6 +93,11 @@ function select_or_other_field_widget_form_prepare_options($field, $instance) {
     }
   }
 
+  // @todo: This isset() can probably be taken out in drupal 8.
+  if (isset($settings['sort_options']) && $settings['sort_options']) {
+    array_multisort(array_map('strtolower', $options), $options);
+  }
+
   return $options;
 }
 
@@ -201,6 +206,12 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     ),
     '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
     '#required' => TRUE,
+  );
+  $form['sort_options'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Sort options'),
+    '#description' => t("Sorts the options in the list alphabetically."),
+    '#default_value' => isset($settings['sort_options']) ? $settings['sort_options'] : 0,
   );
   /*
   There are design issues with saving multiple other values with some field widgets - this needs a rethink.
