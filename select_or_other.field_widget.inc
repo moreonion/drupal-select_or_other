@@ -93,8 +93,6 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     }
   }
 
-  dpm($instance);
-
   // Construct the element.
   $element = array(
     '#type' => 'select_or_other',
