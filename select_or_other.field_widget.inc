@@ -54,9 +54,9 @@ function select_or_other_field_widget_info() {
 }
 
 /**
- * Implements hook_field_widget_form().
+ * Prepare options for the widget list.
  */
-function select_or_other_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+function select_or_other_field_widget_form_prepare_options($field, $instance) {
   $options = array();
 
   $settings = &$instance['widget']['settings'];
@@ -93,13 +93,20 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     }
   }
 
+  return $options;
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function select_or_other_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Construct the element.
   $element = array(
     '#type' => 'select_or_other',
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
-    '#options' => $options,
+    '#options' => select_or_other_field_widget_form_prepare_options($field, $instance),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
     '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
     '#required' => $instance['required'],
@@ -187,8 +194,9 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     '#title' => t('<em>Other</em> value as default value'),
     '#description' => t("If any incoming default values do not appear in <em>available options</em> (i.e. set as <em>other</em> values), what should happen?"),
     '#options' => array(
-      'other' => t('Add the values to the other textfield.'),
-      'append' => t('Append the values to the options'),
+      'other' => t('Add the values to the other textfield'),
+      'append' => t('Append the values to the current list'),
+      'available' => t('Append the values to the available options'),
       'ignore' => t('Ignore the values'),
     ),
     '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
@@ -269,31 +277,25 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     form_set_value($element, $value, $form_state);
     $form_state['clicked_button']['#post'][$element['#name']] = $value; // Is this something we should do?
   }
-  return $element;
-}
 
-/**
- * Implements hook_content_allowed_values_alter().
- *
- * For properly displaying key|value options.
- *
-function select_or_other_content_allowed_values_alter(&$allowed_values, $field) {
-  // Test the operation to avoid validation error with text field valudation on saving
-  if ($field['widget']['module'] == 'select_or_other' && $_POST['op'] != t('Save')) {
-    $list = explode("\n", $field['widget']['available_options']);
-    $list = array_map('trim', $list);
-    $list = array_filter($list, 'strlen');
-    foreach ($list as $option) {
-      // Sanitize the user input with a permissive filter.
-      $option = filter_xss($option);
-      if (strpos($option, '|') !== FALSE) {
-        list($key, $value) = explode('|', $option);
-        $allowed_values[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
-      }
-      else {
-        $allowed_values[$option] = $option;
-      }
+  // Add values to available options is configured to do so.
+  $field_name = &$element['#parents'][0];
+  $language = &$element['#parents'][1];
+  $instance = &$form_state['field'][$field_name][$language]['instance'];
+  if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
+    if (
+      $element['select']['#value'] == 'select_or_other' &&
+      !empty($element['other']['#value']) &&
+      !isset($element['#options'][$element['other']['#value']])
+    ) {
+      // Get the latest instance.
+      $instance = field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle']);
+      // Make the change.
+      $instance['widget']['settings']['available_options'] .= "\n" . $element['other']['#value'];
+      // Save the instance.
+      field_update_instance($instance);
     }
   }
+
+  return $element;
 }
-*/
