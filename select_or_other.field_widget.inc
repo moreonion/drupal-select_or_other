@@ -95,7 +95,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance) {
 
   // @todo: This isset() can probably be taken out in drupal 8.
   if (isset($settings['sort_options']) && $settings['sort_options']) {
-    array_multisort(array_map('strtolower', $options), $options);
+    natcasesort($options);
   }
 
   return $options;
