@@ -102,7 +102,7 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
 
   );
 
-  // If working with checkboxes, create a property so we can identify it in a 
+  // If working with checkboxes, create a property so we can identify it in a
   // process function.
   if ($element['#select_type'] == 'checkboxes') {
     $element['select']['#select_or_other_checkboxes'] = TRUE;
@@ -216,7 +216,7 @@ function _select_or_other_title_display($element) {
  * Element process callback for Select (or other) checkboxes.
  */
 function select_or_other_expand_checkboxes($element) {
-  if ($element['#select_or_other_checkboxes']) {
+  if (isset($element['#select_or_other_checkboxes']) && $element['#select_or_other_checkboxes']) {
     foreach (element_children($element) as $key) {
       $element[$key]['#return_value'] = check_plain($element[$key]['#return_value']);
       $element[$key]['#name'] = $element['#name'] . '[' . $element[$key]['#return_value'] . ']';
