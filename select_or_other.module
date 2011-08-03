@@ -130,7 +130,7 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
     if ($val
         && isset($element['select']['#options'])
         && is_array($element['select']['#options'])
-        && !array_key_exists($val, $element['select']['#options'])
+        && !select_or_other_multi_array_key_exists($val, $element['select']['#options'])
         && !in_array($val, $element['select']['#options'])) {
       // Not a valid option - add it to 'other'.
       if ($element['#other_unknown_defaults'] == 'other') {
@@ -686,4 +686,28 @@ function select_or_other_apachesolr_cck_fields_alter(&$mappings) {
   $mappings['text']['select_or_other_buttons'] = &$map;
   $mappings['text']['select_or_other'] = &$map;
   $mappings['text']['select_or_other_sort'] = &$map;
+}
+
+/**
+ * Helper function to check keys in multidimensional array.
+ *
+ * @param $needle
+ *   The key.
+ * @param $haystack
+ *   The array to check.
+ * @return
+ *   Boolean indicating if the key is set.
+ */
+function select_or_other_multi_array_key_exists($needle, $haystack) {
+  foreach ($haystack as $key => $value) {
+    if ($needle === $key) {
+      return TRUE;
+    }
+    if (is_array($value)) {
+      if (select_or_other_multi_array_key_exists($needle, $value)) {
+        return TRUE;
+      }
+    }
+  }
+  return FALSE;
 }
