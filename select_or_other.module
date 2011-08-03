@@ -637,7 +637,7 @@ function theme_select_or_other_none($field) {
  * Integrate with CCK for properly displaying key|value options.
  */
 function select_or_other_content_allowed_values_alter(&$allowed_values, $field) {
-  // Test the operation to avoid validation error with text field valudation on saving
+  // Test the operation to avoid validation error with text field validation on saving.
   if (
      $field['widget']['module'] == 'select_or_other' &&
      $_POST['op'] != t('Save') &&
