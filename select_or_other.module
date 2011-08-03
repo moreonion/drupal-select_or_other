@@ -151,8 +151,8 @@ function select_or_other_element_process($element, &$form_state) {
         unset($element['select']['#default_value'][$key]);
 
       }
-
-      elseif ($element['#other_unknown_defaults'] == 'append') {
+      // Also checks 'available' because if that setting is newly set, after data is already stored, it should behave like 'append'.
+      elseif ($element['#other_unknown_defaults'] == 'append' || $element['#other_unknown_defaults'] == 'available') {
         $element['select']['#options'][$val] = $val;
       }
 
