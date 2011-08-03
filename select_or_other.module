@@ -643,6 +643,7 @@ function select_or_other_content_allowed_values_alter(&$allowed_values, $field) 
      $_POST['op'] != t('Save') &&
      $_POST['op'] != t('Delete')
   ) {
+
     $list = explode("\n", $field['widget']['available_options']);
     $list = array_map('trim', $list);
     $list = array_filter($list, 'strlen');
@@ -657,6 +658,16 @@ function select_or_other_content_allowed_values_alter(&$allowed_values, $field) 
         $allowed_values[$option] = $option;
       }
     }
+
+    // Add the other value to the allowed values.
+    if (!empty($_POST[$field['field_name']]['other'])) {
+      // Sanitize the user input with a permissive filter.
+      $value = check_plain(content_filter_xss(trim($_POST[$field['field_name']]['other'])));
+      if ($value !== '') {
+        $allowed_values[$value] = $value;
+      }
+    }
+
   }
 }
 
