@@ -143,7 +143,8 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
         // Remove it from the select's default value.
         unset($element['select']['#default_value'][$key]);
       }
-      elseif ($element['#other_unknown_defaults'] == 'append') {
+      // Also checks 'available' because if that setting is newly set, after data is already stored, it should behave like 'append'.
+      elseif ($element['#other_unknown_defaults'] == 'append' || $element['#other_unknown_defaults'] == 'available') {
         $element['select']['#options'][$val] = $val;
       }
 
