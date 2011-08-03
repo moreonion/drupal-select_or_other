@@ -533,8 +533,9 @@ function select_or_other_widget_settings($op, $widget) {
         '#title' => t('<em>Other</em> value as default value'),
         '#description' => t("If any incoming default values do not appear in <em>available options</em> (i.e. set as <em>other</em> values), what should happen?"),
         '#options' => array(
-          'other' => t('Add the values to the other textfield.'),
-          'append' => t('Append the values to the options'),
+          'other' => t('Add the values to the other textfield'),
+          'append' => t('Append the values to the current list'),
+          'available' => t('Append the values to the available options'),
           'ignore' => t('Ignore the values'),
         ),
         '#default_value' => isset($widget['other_unknown_defaults']) ? $widget['other_unknown_defaults'] : 'other',
@@ -611,6 +612,25 @@ function select_or_other_cck_validate($element, &$form_state) {
     form_set_value($element, $value, $form_state);
     $form_state['clicked_button']['#post'][$element['#name']] = $value;  // Is this something we should do?
   }
+
+  // Add values to available options is configured to do so.
+  $field_name = &$element['#parents'][0];
+  $type = &$form_state['values']['type'];
+  module_load_include('inc', 'content', 'includes/content.crud');
+  $instance = reset(content_field_instance_read(array('type_name' => $type, 'field_name' => $field_name)));
+  if ($instance['widget']['other_unknown_defaults'] == 'available') {
+    if (
+      $element['select']['#value'] == 'select_or_other' &&
+      !empty($element['other']['#value']) &&
+      !isset($element['#options'][$element['other']['#value']])
+    ) {
+      // Make the change.
+      $instance['widget']['available_options'] .= "\n" . $element['other']['#value'];
+      // Save the instance.
+      content_field_instance_update($instance);
+    }
+  }
+
   return $element;
 }
 
