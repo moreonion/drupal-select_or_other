@@ -37,15 +37,8 @@ function select_or_other_theme() {
 function theme_select_or_other($variables) {
   $element = $variables['element'];
 
-  // Load the JS file to hide/show the 'other' box when needed.
-  drupal_add_js(drupal_get_path('module', 'select_or_other') . '/select_or_other.js');
-  $output = "<div class=\"select-or-other form-item\">\n";
+  $output = "<div class=\"select-or-other\">\n";
   $output .= drupal_render_children($element) . "\n";
-  // Render #description below both elements.
-  if (!empty($element['#description'])) {
-    $output .= ' <div class="description">' . $element['#description'] . "</div>\n";
-    unset($element['#description']);
-  }
   $output .= "</div>\n";
   return $output;
 }
@@ -66,6 +59,7 @@ function select_or_other_element_info() {
       '#element_validate' => array('select_or_other_element_validate'),
       '#other' => t('Other'),
       '#theme' => 'select_or_other',
+      '#theme_wrappers' => array('form_element'),
     ),
   );
 }
@@ -88,6 +82,12 @@ function select_or_other_element_process($element, &$form_state) {
   $element['#processed'] = TRUE;
 
   unset($element['#type']);
+
+  // Load the JS file to hide/show the 'other' box when needed.
+  $element['#attached']['js'][] = drupal_get_path('module', 'select_or_other') . '/select_or_other.js';
+
+  // Hide the title from the wrapper.
+  $element['#title_display'] = 'none';
 
   // Create the main select box
   // Note that #title, #default_value, #disabled, #multiple, #options, #attributes,
