@@ -197,12 +197,7 @@ function select_or_other_element_process($element, &$form_state) {
       }
     }
     // Also add in a custom class for each.
-    if (isset($element[$sub_element]['#attributes']['class'])) {
-      $element[$sub_element]['#attributes'] .= array('class' => array('select-or-other-' . $sub_element));
-    }
-    else {
-      $element[$sub_element]['#attributes'] = array('class' => array('select-or-other-' . $sub_element));
-    }
+    $element[$sub_element]['#attributes']['class'][] = 'select-or-other-' . $sub_element;
   }
 
   return $element;
