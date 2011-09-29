@@ -732,3 +732,17 @@ function select_or_other_multi_array_key_exists($needle, $haystack) {
   }
   return FALSE;
 }
+
+/**
+ * Implementation of hook_content_multigroup_allowed_widgets().
+ */
+function select_or_other_content_multigroup_allowed_widgets() {
+  return array('select_or_other', 'select_or_other_sort', 'select_or_other_buttons');
+}
+
+/**
+ * Implementation of hook_content_multigroup_no_remove_widgets().
+ */
+function select_or_other_content_multigroup_no_remove_widgets() {
+  return array('select_or_other', 'select_or_other_sort', 'select_or_other_buttons');
+}
