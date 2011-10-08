@@ -80,7 +80,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance) {
       $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
     }
     else {
-      $options[$opt] = $opt;
+      $options[$opt] = html_entity_decode($opt);
     }
   }
 
