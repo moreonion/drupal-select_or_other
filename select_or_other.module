@@ -426,7 +426,7 @@ function select_or_other_widget(&$form, &$form_state, $field, $items, $delta = N
       $options[$key] = (isset($value) && $value !=='') ? html_entity_decode($value) : $key;
     }
     else {
-      $options[$opt] = $opt;
+      $options[$opt] = html_entity_decode($opt);
     }
   }
 
@@ -676,7 +676,7 @@ function select_or_other_content_allowed_values_alter(&$allowed_values, $field) 
         $allowed_values[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
       }
       else {
-        $allowed_values[$option] = $option;
+        $allowed_values[$option] = html_entity_decode($option);
       }
     }
 
