@@ -123,8 +123,8 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#type' => 'select_or_other',
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
-    '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
-    '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, isset($items[$delta])),
+    '#default_value' => !empty($items[$delta]) ? $items[$delta] : NULL,
+    '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, !empty($items[$delta])),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
     '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
     '#required' => $instance['required'],
@@ -323,16 +323,4 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   }
 
   return $element;
-}
-
-/**
- * Implements hook_field_is_empty().
- */
-function select_or_other_field_is_empty($item, $field) {
-/*
-  if (empty($item['value']) && (string) $item['value'] !== '0') {
-    return TRUE;
-  }
-  return FALSE;
-*/
 }
