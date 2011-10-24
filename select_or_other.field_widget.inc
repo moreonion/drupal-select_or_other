@@ -56,7 +56,7 @@ function select_or_other_field_widget_info() {
 /**
  * Prepare options for the widget list.
  */
-function select_or_other_field_widget_form_prepare_options($field, $instance) {
+function select_or_other_field_widget_form_prepare_options($field, $instance, $has_value = FALSE) {
   $options = array();
 
   $settings = &$instance['widget']['settings'];
@@ -84,14 +84,27 @@ function select_or_other_field_widget_form_prepare_options($field, $instance) {
     }
   }
 
-  // Add a 'none' option for non-required single selects, sort selects, and radios
-  if (!isset($instance['required']) || !$instance['required']) {
-    if (($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
-      || ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
-      || ($instance['widget']['type'] == 'select_or_other_sort')) {
-      $options = array('' => theme('select_or_other_none', array('field' => $field, 'instance' => $instance))) + $options;
+  $required = (isset($instance['required']) && $instance['required']);
+  $multiple = !(($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
+    || ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
+    || ($instance['widget']['type'] == 'select_or_other_sort'));
+
+  if ($multiple) {
+    // Multiple select: add a 'none' option for non-required fields.
+    $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
+  }
+  else {
+    // Single select: add a 'none' option for non-required fields,
+    // and a 'select a value' option for required fields that do not come
+    // with a value selected.
+    if (!$required) {
+      $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
+    }
+    else if (!$has_value) {
+      $options = array('' => theme('select_or_other_none', array('instance' => $instance, 'option' => 'option_select'))) + $options;
     }
   }
+
 
   // @todo: This isset() can probably be taken out in drupal 8.
   if (isset($settings['sort_options']) && $settings['sort_options']) {
@@ -111,7 +124,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#default_value' => isset($items[$delta]) ? $items[$delta] : NULL,
-    '#options' => select_or_other_field_widget_form_prepare_options($field, $instance),
+    '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, isset($items[$delta])),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
     '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
     '#required' => $instance['required'],
@@ -161,31 +174,33 @@ function select_or_other_field_widget_settings_form($field, $instance) {
   $form['available_options'] = array(
     '#type' => 'textarea',
     '#title' => t('Available options'),
-    '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.  This is not the same as <em>allowed values</em> (below) which will also restrict what a user can type into the <em>other</em> textfield.'),
+    '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.'),
     '#default_value' => isset($settings['available_options']) ? $settings['available_options'] : '',
+    '#element_validate' => array('select_or_other_field_widget_settings_validate'),
   );
-  $form['available_options_fieldset']['advanced_options'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('PHP code'),
-    '#collapsible' => TRUE,
-    '#collapsed' => empty($settings['available_options_php']),
-  );
+
   if (user_access('Use PHP input for field settings (dangerous - grant with care)')) {
-    $form['available_options_fieldset']['advanced_options']['available_options_php'] = array(
+    $form['available_options_php'] = array(
       '#type' => 'textarea',
-      '#title' => t('Code'),
+      '#title' => t('Available options PHP'),
       '#default_value' => !empty($settings['available_options_php']) ? $settings['available_options_php'] : '',
       '#rows' => 6,
       '#description' => t('Advanced usage only: PHP code that returns a keyed array of available options. Should not include &lt;?php ?&gt; delimiters. If this field is filled out, the array returned by this code will override the available options list above.'),
     );
   }
   else {
-    $form['available_options_fieldset']['advanced_options']['markup_available_options_php'] = array(
-      '#type' => 'item',
-      '#title' => t('Code'),
-      '#value' => !empty($settings['available_options_php']) ? '<code>' . check_plain($settings['available_options_php']) . '</code>' : t('&lt;none&gt;'),
-      '#description' => empty($settings['available_options_php']) ? t("You're not allowed to input PHP code.") : t('This PHP code was set by an administrator and will override the allowed values list above.'),
+    $form['available_options_php'] = array(
+      '#type' => 'value',
+      '#value' => !empty($settings['available_options_php']) ? $settings['available_options_php'] : '',
     );
+    if (!empty($settings['available_options_php'])) {
+      $form['markup_available_options_php'] = array(
+        '#type' => 'item',
+        '#title' => t('Available options PHP'),
+        '#value' => '<code>' . check_plain($settings['available_options_php']) . '</code>',
+        '#description' => empty($settings['available_options_php']) ? t("You're not allowed to input PHP code.") : t('This PHP code was set by an administrator and will override the allowed values list above.'),
+      );
+    }
   }
   $form['other'] = array(
     '#type' => 'textfield',
@@ -231,12 +246,11 @@ function select_or_other_field_widget_settings_form($field, $instance) {
 
 /**
  * Validate callback for a Select (or other) field widget settings form.
- *
- * @todo: this doesn't seem to be getting called?
  */
-function select_or_other_field_widget_settings_validate($form, &$form_state) {
-  if (empty($widget['available_options']) && empty($widget['available_options_php'])) {
-    form_set_error('available_options', t('You must provide <em>Available options</em>.'));
+function select_or_other_field_widget_settings_validate($element, &$form_state, $form) {
+  $settings = &$form_state['values']['instance']['widget']['settings'];
+  if (empty($settings['available_options']) && empty($settings['available_options_php'])) {
+    form_set_error(implode('][', $element['#parents']), t('You must provide <em>Available options</em>.'));
   }
 }
 
@@ -309,4 +323,16 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   }
 
   return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function select_or_other_field_is_empty($item, $field) {
+/*
+  if (empty($item['value']) && (string) $item['value'] !== '0') {
+    return TRUE;
+  }
+  return FALSE;
+*/
 }

@@ -23,8 +23,8 @@ function select_or_other_theme() {
     ),
     'select_or_other_none' => array(
       'variables' => array(
-        'field' => NULL,
         'instance' => NULL,
+        'option' => NULL,
       ),
     ),
   );
@@ -234,20 +234,32 @@ function select_or_other_element_validate($element, &$form_state) {
 }
 
 /**
- * Theme the label for the empty value for options that are not required.
- * The default theme will display N/A for a radio list and blank for a select.
+ * Returns HTML for the label for the empty value for options that are not required.
+ *
+ * The default theme will display N/A for a radio list and '- None -' for a select.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - instance: An array representing the widget requesting the options.
+ *   - option: An array representing the widget requesting the options.
+ *
  */
 function theme_select_or_other_none($variables) {
   $instance = $variables['instance'];
+  $option = $variables['option'];
+
+  $output = '';
   switch ($instance['widget']['type']) {
     case 'select_or_other_buttons':
-      return t('N/A');
+      $output = t('N/A');
+      break;
+
     case 'select_or_other':
     case 'select_or_other_sort':
-      return t('- None -');
-    default:
-      return '';
+      $output = ($option == 'option_none' ? t('- None -') : t('- Select a value -'));
   }
+
+  return $output;
 }
 
 /**
