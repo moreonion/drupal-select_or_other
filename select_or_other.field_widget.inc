@@ -85,18 +85,19 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
   }
 
   $required = (isset($instance['required']) && $instance['required']);
-  $multiple = !(($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
+  $multiple = (($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
     || ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
     || ($instance['widget']['type'] == 'select_or_other_sort'));
 
+  // Multiple select.
   if ($multiple) {
-    // Multiple select: add a 'none' option for non-required fields.
+    // Add a 'none' option for non-required fields.
     $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
   }
+  // Single select.
   else {
-    // Single select: add a 'none' option for non-required fields,
-    // and a 'select a value' option for required fields that do not come
-    // with a value selected.
+    // Add a 'none' option for non-required fields, and a 'select a value'
+    // option for required fields that do not come with a value selected.
     if (!$required) {
       $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
     }

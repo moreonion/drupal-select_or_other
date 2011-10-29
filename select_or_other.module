@@ -256,7 +256,13 @@ function theme_select_or_other_none($variables) {
 
     case 'select_or_other':
     case 'select_or_other_sort':
-      $output = ($option == 'option_none' ? t('- None -') : t('- Select a value -'));
+      if (!empty($variables['option']) && $variables['option'] == 'option_none') {
+        $output = t('- None -');
+      }
+      else {
+        $output = t('- Select a value -');
+      }
+      break;
   }
 
   return $output;
