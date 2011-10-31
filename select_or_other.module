@@ -246,7 +246,6 @@ function select_or_other_element_validate($element, &$form_state) {
  */
 function theme_select_or_other_none($variables) {
   $instance = $variables['instance'];
-  $option = $variables['option'];
 
   $output = '';
   switch ($instance['widget']['type']) {
