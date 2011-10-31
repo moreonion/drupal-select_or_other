@@ -93,14 +93,15 @@ function select_or_other_process($element, $edit, &$form_state, $form) {
     '#options' => $element['#options'],
     '#attributes' => $element['#attributes'],
     '#weight' => 10,
-
-    // The following values were set by the content module and need
-    // to be passed down to the nested element.
-    '#field_name' => $element['#field_name'],
-    '#delta' => $element['#delta'],
-    '#columns' => $element['#columns'],
-
   );
+
+  // The following values were set by the content module and need
+  // to be passed down to the nested element.
+  if (isset($element['#field_name'])) {
+    $element['select']['#field_name'] = $element['#field_name'];
+    $element['select']['#delta'] = $element['#delta'];
+    $element['select']['#columns'] = $element['#columns'];
+  }
 
   // If working with checkboxes, create a property so we can identify it in a
   // process function.
