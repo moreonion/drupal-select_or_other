@@ -305,9 +305,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   }
 
   // Add values to available options is configured to do so.
-  $field_name = &$element['#parents'][0];
-  $language = &$element['#parents'][1];
-  $instance = &$form_state['field'][$field_name][$language]['instance'];
+  $instance = field_widget_instance($element, $form_state);
   if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
     if (
       $element['select']['#value'] == 'select_or_other' &&
