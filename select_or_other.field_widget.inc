@@ -72,7 +72,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
 
   $list = array_map('trim', $list);
   $list = array_filter($list, 'strlen');
-  foreach ($list as $opt) {
+  foreach ($list as $key => $opt) {
     // Sanitize the user input with a permissive filter.
     $opt = filter_xss($opt);
     if (strpos($opt, '|') !== FALSE) {
@@ -80,7 +80,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
       $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
     }
     else {
-      $options[$opt] = html_entity_decode($opt);
+      $options[$key] = html_entity_decode($opt);
     }
   }
 
