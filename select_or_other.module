@@ -721,12 +721,12 @@ function select_or_other_apachesolr_cck_fields_alter(&$mappings) {
  *   Boolean indicating if the key is set.
  */
 function select_or_other_multi_array_key_exists($needle, $haystack) {
-  foreach ($haystack as $key => $value) {
-    if ($needle === $key) {
-      return TRUE;
-    }
-    if (is_array($value)) {
-      if (select_or_other_multi_array_key_exists($needle, $value)) {
+  if (array_key_exists($needle, $haystack)) {
+    return TRUE;
+  }
+  else {
+    foreach ($haystack as $key => $value) {
+      if (is_array($value) && select_or_other_multi_array_key_exists($needle, $value)) {
         return TRUE;
       }
     }
