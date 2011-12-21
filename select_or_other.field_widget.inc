@@ -257,10 +257,10 @@ function select_or_other_field_widget_settings_validate($element, &$form_state, 
 
 /**
  * Element validate callback for a Select (or other) field widget.
- *
- * @todo: does this function work?
  */
 function select_or_other_field_widget_validate($element, &$form_state) {
+  $field_info = field_info_field($element['#field_name']);
+
   $other_selected = FALSE;
 
   if (is_array($element['select']['#value']) && in_array('select_or_other', $element['select']['#value'])) {
@@ -293,6 +293,18 @@ function select_or_other_field_widget_validate($element, &$form_state) {
       $delta = 0;
       $values = array();
       foreach ((array)$value as $v) {
+        if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v)) {
+          form_error($element, t('Value must be a valid integer.'));
+          break;
+        }
+        if (($field_info['type'] == 'number_float' || $field_info['type'] == 'number_decimal') && !is_numeric($v)) {
+          form_error($element, t('Value must be a valid integer or decimal.'));
+          break;
+        }
+        elseif ($field_info['type'] == 'text' && drupal_strlen($v) > 255) {
+          form_error($element, t('Value must be a string at most 255 characters long.'));
+          break;
+        }
         $values[$delta++]['value'] = $v;
       }
       $value = $values;
@@ -321,7 +333,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     }
   }
 
-  return $element;
+  //return $element;
 }
 
 /**
@@ -365,4 +377,12 @@ function select_or_other_field_formatter_view($entity_type, $entity, $field, $in
   }
 
   return $element;
+}
+
+
+/**
+ * Implements hook_field_widget_error().
+ */
+function select_or_other_field_widget_error($element, $error, $form, &$form_state) {
+  form_error($element, $error['message']);
 }
