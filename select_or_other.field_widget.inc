@@ -92,7 +92,9 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
   // Multiple select.
   if ($multiple) {
     // Add a 'none' option for non-required fields.
-    $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
+    if (!$required) {
+      $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
+    }
   }
   // Single select.
   else {
