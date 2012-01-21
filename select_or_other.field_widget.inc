@@ -137,6 +137,9 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#element_validate' => array('select_or_other_field_widget_validate'),
     '#field_widget' => $instance['widget']['type'],
   );
+  if (!empty($field['settings']['max_length'])) {
+    $element['#maxlength'] = $field['settings']['max_length'];
+  }
 
   // Set select type's.
   switch ($instance['widget']['type']) {

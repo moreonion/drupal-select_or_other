@@ -199,6 +199,9 @@ function select_or_other_element_process($element, &$form_state) {
     // Also add in a custom class for each.
     $element[$sub_element]['#attributes']['class'][] = 'select-or-other-' . $sub_element;
   }
+  if (!empty($element['#maxlength'])) {
+    $element['other']['#maxlength'] = $element['#maxlength'];
+  }
 
   return $element;
 }
