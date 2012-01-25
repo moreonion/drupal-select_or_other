@@ -11,7 +11,6 @@
 // Include the inc files.
 module_load_include('inc', 'select_or_other', 'select_or_other.test_form');
 module_load_include('inc', 'select_or_other', 'select_or_other.field_widget');
-module_load_include('inc', 'select_or_other', 'select_or_other.apachesolr');
 
 /**
  * Implements hook_theme().
