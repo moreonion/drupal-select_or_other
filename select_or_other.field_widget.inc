@@ -75,12 +75,18 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
   foreach ($list as $key => $opt) {
     // Sanitize the user input with a permissive filter.
     $opt = filter_xss($opt);
-    if (strpos($opt, '|') !== FALSE) {
+    // If option has a key specified
+    if (strpos($opt, '|') !== FALSE && empty($settings['available_options_php'])) {
       list($key, $value) = explode('|', $opt);
       $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
     }
-    else {
+    // If options from PHP
+    elseif (!empty($settings['available_options_php'])) {
       $options[$key] = html_entity_decode($opt);
+    }
+    // If option has no key specified and is not from PHP
+    else {
+      $options[$opt] = html_entity_decode($opt);
     }
   }
 
