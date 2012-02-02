@@ -662,8 +662,8 @@ function select_or_other_content_allowed_values_alter(&$allowed_values, $field) 
   // Test the operation to avoid validation error with text field validation on saving.
   if (
      $field['widget']['module'] == 'select_or_other' &&
-     $_POST['op'] != t('Save') &&
-     $_POST['op'] != t('Delete')
+     (empty($_POST['op']) || ( !empty($_POST['op']) && $_POST['op'] != t('Save'))) &&
+     (empty($_POST['op']) || ( !empty($_POST['op']) && $_POST['op'] != t('Delete')))
   ) {
 
     $list = explode("\n", $field['widget']['available_options']);
