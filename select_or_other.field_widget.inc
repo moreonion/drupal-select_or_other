@@ -191,7 +191,7 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     '#element_validate' => array('select_or_other_field_widget_settings_validate'),
   );
 
-  if (user_access('Use PHP input for field settings (dangerous - grant with care)')) {
+  if (user_access('use PHP for settings')) {
     $form['available_options_php'] = array(
       '#type' => 'textarea',
       '#title' => t('Available options PHP'),
