@@ -312,8 +312,8 @@ function select_or_other_field_widget_validate($element, &$form_state) {
           form_error($element, t('Value must be a valid integer or decimal.'));
           break;
         }
-        elseif ($field_info['type'] == 'text' && drupal_strlen($v) > 255) {
-          form_error($element, t('Value must be a string at most 255 characters long.'));
+        elseif ($field_info['type'] == 'text' && drupal_strlen($v) > $field_info['settings']['max_length']) {
+          form_error($element, t('Value must be a string at most @max characters long.', array('@max' => $field_info['settings']['max_length'])));
           break;
         }
         $values[$delta++]['value'] = $v;
