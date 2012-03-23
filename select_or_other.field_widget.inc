@@ -292,7 +292,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   if ($other_selected && !$element['other']['#value']) {
     form_error($element['other'], t('%name: @title is required', array('%name' => t($element['select']['#title']), '@title' => $element['#other'])));
   }
-  if (isset($value)) {
+  if (isset($value) && $value !== "") {
     if (in_array($element['#field_widget'], array('select_or_other', 'select_or_other_buttons'))) {
       // Filter out 'none' value (if present, will always be in key 0)
       if (isset($items[0]['value']) && $items[0]['value'] === '') {
