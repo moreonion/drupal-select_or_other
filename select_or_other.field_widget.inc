@@ -91,9 +91,9 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
   }
 
   $required = (isset($instance['required']) && $instance['required']);
-  $multiple = (($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1)
-    || ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
+  $multiple = (($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
     || ($instance['widget']['type'] == 'select_or_other_sort'));
+  $multiple_checkbox = ($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1);
 
   // Multiple select.
   if ($multiple) {
@@ -103,17 +103,16 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     }
   }
   // Single select.
-  else {
+  elseif (!$multiple_checkbox) {
     // Add a 'none' option for non-required fields, and a 'select a value'
     // option for required fields that do not come with a value selected.
     if (!$required) {
       $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
     }
-    else if (!$has_value) {
+    elseif (!$has_value) {
       $options = array('' => theme('select_or_other_none', array('instance' => $instance, 'option' => 'option_select'))) + $options;
     }
   }
-
 
   // @todo: This isset() can probably be taken out in drupal 8.
   if (isset($settings['sort_options']) && $settings['sort_options']) {
