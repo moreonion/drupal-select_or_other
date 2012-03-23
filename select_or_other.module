@@ -112,6 +112,10 @@ function select_or_other_element_process($element, &$form_state) {
 
   );
 
+  if (isset($element['#empty_value'])) {
+    $element['select']['#empty_value'] = $element['#empty_value'];
+  };
+
   // Remove the default value on the container level so it doesn't get rendered there.
   $element['#value'] = NULL;
   // Remove the required parameter so FAPI doesn't force us to fill in the textfield.
