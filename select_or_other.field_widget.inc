@@ -54,6 +54,31 @@ function select_or_other_field_widget_info() {
 }
 
 /**
+ * Prepare a single option.
+ */
+function select_or_other_field_widget_form_prepare_option(&$options, $key, $opt, $settings) {
+  $opt = trim($opt);
+  if (empty($opt)) {
+    return;
+  }
+  // Sanitize the user input with a permissive filter.
+  $opt = filter_xss($opt);
+  // If option has a key specified
+  if (strpos($opt, '|') !== FALSE && empty($settings['available_options_php'])) {
+    list($key, $value) = explode('|', $opt);
+    $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
+  }
+  // If options from PHP
+  elseif (!empty($settings['available_options_php'])) {
+    $options[$key] = html_entity_decode($opt);
+  }
+  // If option has no key specified and is not from PHP
+  else {
+    $options[$opt] = html_entity_decode($opt);
+  }
+}
+
+/**
  * Prepare options for the widget list.
  */
 function select_or_other_field_widget_form_prepare_options($field, $instance, $has_value = FALSE) {
@@ -70,23 +95,16 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     ob_end_clean();
   }
 
-  $list = array_map('trim', $list);
-  $list = array_filter($list, 'strlen');
   foreach ($list as $key => $opt) {
-    // Sanitize the user input with a permissive filter.
-    $opt = filter_xss($opt);
-    // If option has a key specified
-    if (strpos($opt, '|') !== FALSE && empty($settings['available_options_php'])) {
-      list($key, $value) = explode('|', $opt);
-      $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
+    if (is_array($opt)) {
+      $optgroup_options = array();
+      foreach ($opt as $optgroup_key => $optgroup_opt) {
+        select_or_other_field_widget_form_prepare_option($optgroup_options, $optgroup_key, $optgroup_opt, $settings);
+        $options[$key] = $optgroup_options;
+      }
     }
-    // If options from PHP
-    elseif (!empty($settings['available_options_php'])) {
-      $options[$key] = html_entity_decode($opt);
-    }
-    // If option has no key specified and is not from PHP
     else {
-      $options[$opt] = html_entity_decode($opt);
+      select_or_other_field_widget_form_prepare_option($options, $key, $opt, $settings);
     }
   }
 
