@@ -85,9 +85,6 @@ function select_or_other_element_process($element, &$form_state) {
   // Load the JS file to hide/show the 'other' box when needed.
   $element['#attached']['js'][] = drupal_get_path('module', 'select_or_other') . '/select_or_other.js';
 
-  // Hide the title from the wrapper.
-  $element['#title_display'] = 'none';
-
   // Create the main select box
   // Note that #title, #default_value, #disabled, #multiple, #options, #attributes,
   // #required, and #size as passed to the select box from the main element.
@@ -95,6 +92,7 @@ function select_or_other_element_process($element, &$form_state) {
   $element['select'] = array(
     '#type' => $element['#select_type'],
     '#title' => $element['#title'],
+    '#title_display' => $element['#title_display'],
     '#default_value' => $element['#default_value'],
     '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
@@ -205,6 +203,9 @@ function select_or_other_element_process($element, &$form_state) {
   if (!empty($element['#maxlength'])) {
     $element['other']['#maxlength'] = $element['#maxlength'];
   }
+
+  // Hide the title from the wrapper.
+  $element['#title'] = NULL;
 
   return $element;
 }
