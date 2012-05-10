@@ -254,7 +254,7 @@ function select_or_other_field_widget_settings_form($field, $instance) {
   $form['sort_options'] = array(
     '#type' => 'checkbox',
     '#title' => t('Sort options'),
-    '#description' => t("Sorts the options in the list alphabetically."),
+    '#description' => t("Sorts the options in the list alphabetically by value."),
     '#default_value' => isset($settings['sort_options']) ? $settings['sort_options'] : 0,
   );
   /*
@@ -287,7 +287,8 @@ function select_or_other_field_widget_settings_validate($element, &$form_state, 
  * Element validate callback for a Select (or other) field widget.
  */
 function select_or_other_field_widget_validate($element, &$form_state) {
-  $field_info = field_info_field($element['#field_name']);
+  $field_name = $element['#parents'][0];
+  $field_info = field_info_field($field_name);
 
   $other_selected = FALSE;
 
@@ -345,7 +346,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   }
 
   // Add values to available options is configured to do so.
-  $instance = field_widget_instance($element, $form_state);
+  $instance = $form_state['field'][$field_name][$element['#parents'][1]]['instance'];
   if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
     if (
       $element['select']['#value'] == 'select_or_other' &&
