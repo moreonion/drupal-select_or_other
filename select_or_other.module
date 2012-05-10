@@ -86,8 +86,9 @@ function select_or_other_element_process($element, &$form_state) {
   $element['#attached']['js'][] = drupal_get_path('module', 'select_or_other') . '/select_or_other.js';
 
   // Create the main select box
-  // Note that #title, #default_value, #disabled, #multiple, #options, #attributes,
-  // #required, and #size as passed to the select box from the main element.
+  // Note that #title, #title_display, #default_value, #disabled, #multiple,
+  // #required, #size, #options, and #attributes are passed to the select box
+  // from the main element automatically.
 
   $element['select'] = array(
     '#type' => $element['#select_type'],
@@ -101,13 +102,6 @@ function select_or_other_element_process($element, &$form_state) {
     '#options' => $element['#options'],
     '#attributes' => $element['#attributes'],
     '#weight' => 10,
-
-    // The following values were set by the content module and need
-    // to be passed down to the nested element.
-    //'#field_name' => $element['#field_name'],
-    //'#delta' => $element['#delta'],
-    //'#columns' => $element['#columns'],
-
   );
 
   if (isset($element['#empty_value'])) {
