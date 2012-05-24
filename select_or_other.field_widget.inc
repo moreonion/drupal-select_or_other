@@ -349,7 +349,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   $instance = $form_state['field'][$field_name][$element['#parents'][1]]['instance'];
   if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
     if (
-      $element['select']['#value'] == 'select_or_other' &&
+      ($element['select']['#value'] == 'select_or_other' || in_array('select_or_other', $element['select']['#value'])) &&
       !empty($element['other']['#value']) &&
       !isset($element['#options'][$element['other']['#value']])
     ) {
