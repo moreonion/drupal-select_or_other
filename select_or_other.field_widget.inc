@@ -20,6 +20,7 @@ function select_or_other_field_widget_info() {
     'available_options_php' => '',
     'markup_available_options_php' => t('&lt;none&gt;'),
     'other' => t('Other'),
+    'other_title' => '',
     'other_unknown_defaults' => 'other',
   );
   return array(
@@ -149,6 +150,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#type' => 'select_or_other',
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
+    '#other_title' => !empty($instance['widget']['settings']['other_title']) ? $instance['widget']['settings']['other_title'] : NULL,
     '#default_value' => !empty($items[$delta]) ? $items[$delta] : NULL,
     '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, !empty($items[$delta])),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
@@ -237,6 +239,12 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     '#description' => t('Label for the option that the user will choose when they want to supply an <em>other</em> value.'),
     '#default_value' => isset($settings['other']) ? $settings['other'] : t('Other'),
     '#required' => TRUE,
+  );
+  $form['other_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<em>Other</em> field title'),
+    '#description' => t('Label for the field in which the user will supply an <em>other</em> value.'),
+    '#default_value' => isset($settings['other_title']) ? $settings['other_title'] : '',
   );
   $form['other_unknown_defaults'] = array(
     '#type' => 'select',
