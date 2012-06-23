@@ -8,7 +8,9 @@ function select_or_other_check_and_show(ele, page_init) {
     ele = $(ele).parents(".select-or-other")[0];
   }
   if ($(ele).find(".select-or-other-select option:selected[value=select_or_other], .select-or-other-select:checked[value=select_or_other]").length) {
-    $(ele).find(".select-or-other-other").parent("div.form-item").show(speed);
+    $(ele).find(".select-or-other-other").parent("div.form-item").show(speed, function() {
+      $(this).find(".select-or-other-other").focus();
+    });
   }
   else {
     $(ele).find(".select-or-other-other").parent("div.form-item").hide(speed);
