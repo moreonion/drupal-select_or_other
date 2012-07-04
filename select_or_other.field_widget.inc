@@ -34,7 +34,7 @@ function select_or_other_field_widget_info() {
       'settings' => $settings,
     ),
     'select_or_other_sort' => array(
-      'label' => t('Select (or other) drag and drop lists'),
+      'label' => t('Select (or other) drag and drop lists [deprecated in favor of Field Collection]'),
       'field types' => $field_types,
       'behaviors' => array(
         'multiple values' => FIELD_BEHAVIOR_DEFAULT,
