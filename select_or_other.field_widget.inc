@@ -300,7 +300,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
 
   $other_selected = FALSE;
 
-  if (isset($element['select']['#value']['select_or_other'])) {
+  if (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other'])) {
     // This is a multiselect. assoc arrays
     $other_selected = TRUE;
     $value = $element['select']['#value'];
@@ -364,7 +364,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   field_widget_instance($element, $form_state);
   if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
     if (
-      ($element['select']['#value'] == 'select_or_other' || isset($element['select']['#value']['select_or_other'])) &&
+      ($element['select']['#value'] == 'select_or_other' || (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other']))) &&
       !empty($element['other']['#value']) &&
       !isset($element['#options'][$element['other']['#value']])
     ) {
