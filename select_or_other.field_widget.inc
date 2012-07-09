@@ -295,7 +295,8 @@ function select_or_other_field_widget_settings_validate($element, &$form_state, 
  * Element validate callback for a Select (or other) field widget.
  */
 function select_or_other_field_widget_validate($element, &$form_state) {
-  $field_name = $element['#parents'][0];
+  //$field_name = $element['#parents'][count($element['#parents']) - 2];
+  $field_name = $element['#field_name'];
   $field_info = field_info_field($field_name);
 
   $other_selected = FALSE;
@@ -361,7 +362,6 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     $instance = field_widget_instance($element, $form_state);
   }
 
-  field_widget_instance($element, $form_state);
   if ($instance['widget']['settings']['other_unknown_defaults'] == 'available') {
     if (
       ($element['select']['#value'] == 'select_or_other' || (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other']))) &&
