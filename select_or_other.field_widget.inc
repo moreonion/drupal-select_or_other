@@ -138,6 +138,13 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     natcasesort($options);
   }
 
+  // Align with Drupal core select list, NULL (-None-) value.
+  // http://drupal.org/node/1830090
+  if (isset($options['']['- None -']) || isset($options['']['- Select a value -'])) {
+    $value = $options[''];
+    unset($options['']);
+    $options = array_merge(array("_none" => $value), $options); 
+  }
   return $options;
 }
 
@@ -292,6 +299,21 @@ function select_or_other_field_widget_settings_validate($element, &$form_state, 
 }
 
 /**
+ * Transforms submitted form values into field storage format.
+ * Align with Drupal core select list, NULL (-None-) value.
+ * http://drupal.org/node/1830090
+ */
+function _select_or_other_options_form_to_storage($value) {
+  if (isset($value[0])) {
+    $index = array_search('_none', $value[0], TRUE);
+    if ($index !== FALSE) {
+      unset($value[0][$index]);
+    }
+  }
+  return $value;
+}
+
+/**
  * Element validate callback for a Select (or other) field widget.
  */
 function select_or_other_field_widget_validate($element, &$form_state) {
@@ -350,6 +372,11 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     elseif ($element['#field_widget'] == 'select_or_other_sort') {
       $value = array('value' => $value);
     }
+
+    // Align with Drupal core select list, NULL (-None-) value.
+    // http://drupal.org/node/1830090
+    $value = _select_or_other_options_form_to_storage($value);
+
     form_set_value($element, $value, $form_state);
     $form_state['clicked_button']['#post'][$element['#name']] = $value; // Is this something we should do?
   }
