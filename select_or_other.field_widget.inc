@@ -401,17 +401,20 @@ function select_or_other_field_formatter_info() {
 function select_or_other_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
   $settings = $display['settings'];
+  $field_options = array();
 
-  $field_options = explode("\n", $instance['widget']['settings']['available_options']);
-  $pos = strpos($instance['widget']['settings']['available_options'], '|');
+  if (isset($instance['widget']['settings']['available_options'])) {
+    $field_options = explode("\n", $instance['widget']['settings']['available_options']);
+    $pos = strpos($instance['widget']['settings']['available_options'], '|');
 
-  if ($pos !== FALSE) {
-    // There are keys.
-    foreach ($field_options as $field_item) {
-      $exploded = explode('|', $field_item);
-      $temp_options[$exploded[0]] = $exploded[1];
+    if ($pos !== FALSE) {
+      // There are keys.
+      foreach ($field_options as $field_item) {
+        $exploded = explode('|', $field_item);
+        $temp_options[$exploded[0]] = $exploded[1];
+      }
+      $field_options = $temp_options;
     }
-    $field_options = $temp_options;
   }
 
   foreach ($items as $delta => $item) {
