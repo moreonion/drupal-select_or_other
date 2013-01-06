@@ -317,7 +317,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     $value = $element['select']['#value'];
   }
   if ($other_selected && !$element['other']['#value']) {
-    form_error($element['other'], t('%name: @title is required', array('%name' => t($element['select']['#title']), '@title' => $element['#other'])));
+    form_error($element['other'], t('!name: !title is required', array('!name' => t($element['select']['#title']), '!title' => $element['#other'])));
   }
   if (isset($value) && $value !== "") {
     if (in_array($element['#field_widget'], array('select_or_other', 'select_or_other_buttons'))) {
@@ -326,21 +326,21 @@ function select_or_other_field_widget_validate($element, &$form_state) {
         unset($items[0]);
       }
       if ($element['#multiple'] >= 2 && count($value) > $element['#multiple']) {
-        form_error($element['select'], t('%name: this field cannot hold more than @count values.', array('%name' => t($element['select']['#title']), '@count' => $element['#multiple'])));
+        form_error($element['select'], t('!name: cannot hold more than @count values.', array('!name' => t($element['select']['#title']), '@count' => $element['#multiple'])));
       }
       $delta = 0;
       $values = array();
       foreach ((array)$value as $v) {
         if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v)) {
-          form_error($element, t('Value must be a valid integer.'));
+          form_error($element, t('!name field must be a valid integer.', array('%name' => t($element['select']['#title']))));
           break;
         }
         if (($field_info['type'] == 'number_float' || $field_info['type'] == 'number_decimal') && !is_numeric($v)) {
-          form_error($element, t('Value must be a valid integer or decimal.'));
+          form_error($element, t('!name field must be a valid integer or decimal.', array('!name' => t($element['select']['#title']))));
           break;
         }
         elseif ($field_info['type'] == 'text' && drupal_strlen($v) > $field_info['settings']['max_length']) {
-          form_error($element, t('Value must be a string at most @max characters long.', array('@max' => $field_info['settings']['max_length'])));
+          form_error($element, t('!name field must be a string at most @max characters long.', array('!name' => t($element['select']['#title']), '@max' => $field_info['settings']['max_length'])));
           break;
         }
         $values[$delta++]['value'] = $v;
