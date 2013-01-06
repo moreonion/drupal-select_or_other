@@ -280,7 +280,7 @@ function theme_select_or_other_none($variables) {
  *   Boolean indicating if the key is set.
  */
 function select_or_other_multi_array_key_exists($needle, $haystack) {
-  if (array_key_exists($needle, $haystack)) {
+  if (array_key_exists(html_entity_decode($needle, ENT_QUOTES), $haystack)) {
     return TRUE;
   }
   else {
