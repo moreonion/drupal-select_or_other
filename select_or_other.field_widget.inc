@@ -114,11 +114,12 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     || ($instance['widget']['type'] == 'select_or_other_sort'));
   $multiple_checkbox = ($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1);
 
+  $empty_option = array('_none' => theme('select_or_other_none', array('instance' => $instance)));
   // Multiple select.
   if ($multiple) {
     // Add a 'none' option for non-required fields.
     if (!$required) {
-      $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
+      $options = $empty_option + $options;
     }
   }
   // Single select.
@@ -126,10 +127,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     // Add a 'none' option for non-required fields, and a 'select a value'
     // option for required fields that do not come with a value selected.
     if (!$required) {
-      $options = array('' => theme('select_or_other_none', array('instance' => $instance))) + $options;
-    }
-    elseif (!$has_value) {
-      $options = array('' => theme('select_or_other_none', array('instance' => $instance, 'option' => 'option_select'))) + $options;
+      $options = $empty_option + $options;
     }
   }
 
@@ -138,13 +136,6 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     natcasesort($options);
   }
 
-  // Align with Drupal core select list, NULL (-None-) value.
-  // http://drupal.org/node/1830090
-  if (isset($options['']['- None -']) || isset($options['']['- Select a value -'])) {
-    $value = $options[''];
-    unset($options['']);
-    $options = array_merge(array("_none" => $value), $options); 
-  }
   return $options;
 }
 
