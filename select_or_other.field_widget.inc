@@ -33,6 +33,7 @@ function select_or_other_field_widget_info() {
         'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
       'settings' => $settings,
+      'weight' => 2,
     ),
     'select_or_other_sort' => array(
       'label' => t('Select (or other) drag and drop lists [deprecated in favor of Field Collection]'),
@@ -42,6 +43,7 @@ function select_or_other_field_widget_info() {
         'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
       'settings' => $settings,
+      'weight' => 2,
     ),
     'select_or_other_buttons' => array(
       'label' => t('Select (or other) check boxes/radio buttons'),
@@ -51,6 +53,7 @@ function select_or_other_field_widget_info() {
         'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
       'settings' => $settings,
+      'weight' => 2,
     ),
   );
 }
