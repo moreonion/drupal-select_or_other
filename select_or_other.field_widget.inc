@@ -22,6 +22,7 @@ function select_or_other_field_widget_info() {
     'other' => t('Other'),
     'other_title' => '',
     'other_unknown_defaults' => 'other',
+    'other_size' => 60,
   );
   return array(
     'select_or_other' => array(
@@ -149,6 +150,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#other_title' => !empty($instance['widget']['settings']['other_title']) ? $instance['widget']['settings']['other_title'] : NULL,
+    '#other_size' => $instance['widget']['settings']['other_size'],
     '#default_value' => !empty($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
     '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, !empty($items[$delta])),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
@@ -257,6 +259,13 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
     '#required' => TRUE,
   );
+  $form['other_size'] = array(
+    '#type' => 'textfield',
+    '#title' => t('<em>Other</em> field size'),
+    '#default_value' => $settings['other_size'],
+    '#required' => TRUE,
+    '#element_validate' => array('element_validate_integer_positive'),
+  );
   $form['sort_options'] = array(
     '#type' => 'checkbox',
     '#title' => t('Sort options'),
@@ -285,6 +294,7 @@ function select_or_other_field_widget_settings_form($field, $instance) {
 function select_or_other_field_widget_settings_validate($element, &$form_state, $form) {
   $settings = &$form_state['values']['instance']['widget']['settings'];
   if (empty($settings['available_options']) && empty($settings['available_options_php'])) {
+    dpm($settings['available_options']);
     form_set_error(implode('][', $element['#parents']), t('You must provide <em>Available options</em>.'));
   }
 }

@@ -197,6 +197,9 @@ function select_or_other_element_process($element, &$form_state) {
   if (!empty($element['#maxlength'])) {
     $element['other']['#maxlength'] = $element['#maxlength'];
   }
+  if (isset($element['#other_size'])) {
+    $element['other']['#size'] = $element['#other_size'];
+  }
 
   // Hide the title from the wrapper.
   $element['#title_error'] = $element['#title'];
