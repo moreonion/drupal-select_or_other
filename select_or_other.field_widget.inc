@@ -294,7 +294,6 @@ function select_or_other_field_widget_settings_form($field, $instance) {
 function select_or_other_field_widget_settings_validate($element, &$form_state, $form) {
   $settings = &$form_state['values']['instance']['widget']['settings'];
   if (empty($settings['available_options']) && empty($settings['available_options_php'])) {
-    dpm($settings['available_options']);
     form_set_error(implode('][', $element['#parents']), t('You must provide <em>Available options</em>.'));
   }
 }
