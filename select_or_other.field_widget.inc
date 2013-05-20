@@ -148,9 +148,8 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
  */
 function select_or_other_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   // Construct the element.
-  $element = array(
+  $element = $element + array(
     '#type' => 'select_or_other',
-    '#title' => isset($instance['label']) ? $instance['label'] : NULL,
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#other_title' => !empty($instance['widget']['settings']['other_title']) ? $instance['widget']['settings']['other_title'] : NULL,
     '#other_size' => $instance['widget']['settings']['other_size'],
