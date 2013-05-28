@@ -356,7 +356,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
       $values = array();
       foreach ((array)$value as $v) {
         if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v)) {
-          form_error($element, t('!name field must be a valid integer.', array('%name' => t($element['select']['#title']))));
+          form_error($element, t('!name field must be a valid integer.', array('!name' => t($element['select']['#title']))));
           break;
         }
         if (($field_info['type'] == 'number_float' || $field_info['type'] == 'number_decimal') && !is_numeric($v)) {
