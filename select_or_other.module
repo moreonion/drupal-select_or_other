@@ -50,7 +50,6 @@ function select_or_other_element_info() {
     'select_or_other' => array(
       '#select_type' => 'select',
       '#input' => TRUE,
-      '#size' => 0,
       '#multiple' => FALSE,
       '#disabled' => FALSE,
       '#default_value' => NULL,
@@ -98,7 +97,7 @@ function select_or_other_element_process($element, &$form_state) {
     '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
     '#required' => $element['#required'],
-    '#size' => $element['#size'],
+    '#size' => isset($element['#size']) ? $element['#size'] : NULL,
     '#options' => $element['#options'],
     '#attributes' => $element['#attributes'],
     '#weight' => 10,
