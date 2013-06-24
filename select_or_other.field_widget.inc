@@ -161,7 +161,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
     '#other' => isset($instance['widget']['settings']['other']) ? $instance['widget']['settings']['other'] : t('Other'),
     '#other_title' => !empty($instance['widget']['settings']['other_title']) ? $instance['widget']['settings']['other_title'] : NULL,
     '#other_size' => $instance['widget']['settings']['other_size'],
-    '#default_value' => !empty($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
+    '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : NULL,
     '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, !empty($items[$delta])),
     '#description' => isset($instance['description']) ? $instance['description'] : '',
     '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
