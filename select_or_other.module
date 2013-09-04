@@ -201,7 +201,7 @@ function select_or_other_element_process($element, &$form_state) {
   }
 
   // Hide the title from the wrapper.
-  $element['#title_display'] = 'invisible';
+  $element['#title'] = NULL;
 
   return $element;
 }
