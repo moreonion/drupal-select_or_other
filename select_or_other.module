@@ -79,8 +79,6 @@ function select_or_other_element_process($element, &$form_state) {
   $element['#tree'] = TRUE;
   $element['#processed'] = TRUE;
 
-  unset($element['#type']);
-
   // Load the JS file to hide/show the 'other' box when needed.
   $element['#attached']['js'][] = drupal_get_path('module', 'select_or_other') . '/select_or_other.js';
 
