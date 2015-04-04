@@ -51,7 +51,6 @@ function select_or_other_element_info() {
       '#select_type' => 'select',
       '#input' => TRUE,
       '#multiple' => FALSE,
-      '#disabled' => FALSE,
       '#default_value' => NULL,
       '#process' => array('select_or_other_element_process'),
       '#element_validate' => array('select_or_other_element_validate'),
@@ -83,16 +82,15 @@ function select_or_other_element_process($element, &$form_state) {
   $element['#attached']['js'][] = drupal_get_path('module', 'select_or_other') . '/select_or_other.js';
 
   // Create the main select box
-  // Note that #title, #title_display, #default_value, #disabled, #multiple,
-  // #required, #size, #options, and #attributes are passed to the select box
-  // from the main element automatically.
+  // Note that #title, #title_display, #default_value, #multiple, #required,
+  // #size, #options, and #attributes are passed to the select box from the
+  // main element automatically.
 
   $element['select'] = array(
     '#type' => $element['#select_type'],
     '#title' => $element['#title'],
     '#title_display' => $element['#title_display'],
     '#default_value' => $element['#default_value'],
-    '#disabled' => $element['#disabled'],
     '#multiple' => $element['#multiple'],
     '#required' => $element['#required'],
     '#size' => isset($element['#size']) ? $element['#size'] : NULL,
@@ -177,7 +175,6 @@ function select_or_other_element_process($element, &$form_state) {
     '#type' => 'textfield',
     '#weight' => 20,
     '#default_value' => $other_default_string,
-    '#disabled' => $element['#disabled'],
     '#attributes' => $element['#attributes'],
   );
 
