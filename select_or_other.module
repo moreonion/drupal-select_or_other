@@ -217,14 +217,14 @@ function select_or_other_process_form_element(&$variables) {
 function select_or_other_element_validate($element, &$form_state) {
   $other_selected = FALSE;
   if (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other'])) {
-    // This is a multiselect. assoc arrays
+    // This is a multiselect, which uses associated arrays.
     $other_selected = TRUE;
     $value = $element['select']['#value'];
     unset($value['select_or_other']);
     $value[$element['other']['#value']] = $element['other']['#value'];
   }
   elseif (is_string($element['select']['#value']) && $element['select']['#value'] == 'select_or_other') {
-    // This is a single select.
+    // This is a single select, which uses strings.
     $other_selected = TRUE;
     $value = $element['other']['#value'];
   }
@@ -250,7 +250,8 @@ function select_or_other_element_validate($element, &$form_state) {
  *   An associative array containing:
  *   - instance: An array representing the widget requesting the options.
  *   - option: An array representing the widget requesting the options.
- *
+ * @return string
+ *  A HTML string for the empty value for options that are not required.
  */
 function theme_select_or_other_none($variables) {
   $instance = $variables['instance'];
@@ -282,7 +283,7 @@ function theme_select_or_other_none($variables) {
  *   The key.
  * @param $haystack
  *   The array to check.
- * @return
+ * @return boolean
  *   Boolean indicating if the key is set.
  */
 function select_or_other_multi_array_key_exists($needle, $haystack) {
