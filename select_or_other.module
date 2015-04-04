@@ -200,10 +200,18 @@ function select_or_other_element_process($element, &$form_state) {
     $element['other']['#size'] = $element['#other_size'];
   }
 
-  // Hide the title from the wrapper.
-  $element['#title'] = NULL;
-
   return $element;
+}
+
+/**
+ * Implements hook_process_HOOK().
+ */
+function select_or_other_process_form_element(&$variables) {
+  // Hide the title from the wrapper.
+  if (isset($variables['element']['#theme']) &&
+  $variables['element']['#theme'] === 'select_or_other') {
+    $variables['element']['#title'] = NULL;
+  }
 }
 
 /**
