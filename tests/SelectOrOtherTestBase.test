@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ *  Contains SelectOrOtherTestBase.
+ */
+
+/**
+ * Class SelectOrOtherTestBase
+ *   Base class for select_or_other testing.
+ */
+class SelectOrOtherTestBase extends DrupalWebTestCase {
+
+  /**
+   * Check to see if a label is visible only once.
+   * @param string $label
+   *   The label to look for.
+   * @param string $element_name
+   *   The element the label should be for.
+   */
+  protected function assertLabelVisibleOnce($label, $element_name) {
+    $xpath = "//label[@for[starts-with(., :element-name)] and starts-with(., :label)]";
+    $arguments = array(':label' => $label, ':element-name' => $element_name);
+    $message_arguments = array('%label' => $label, '%element-name' => $element_name);
+
+    $elements = $this->xpath($xpath, $arguments);
+    $this->assertEqual(count($elements), 1, t('%label is visible once for element %element', $message_arguments));
+  }
+
+}

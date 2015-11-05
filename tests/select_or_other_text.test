@@ -3,7 +3,7 @@
 /**
  * Tests the select or other text field based functionality
  */
-class SelectOrOtherTextTestCase extends DrupalWebTestCase {
+class SelectOrOtherTextTestCase extends SelectOrOtherTestBase {
   protected $privileged_user;
   protected $single_field_name;
   protected $single_field;
@@ -77,6 +77,17 @@ class SelectOrOtherTextTestCase extends DrupalWebTestCase {
         ),
       ) + $instance_defaults;
     field_create_instance($this->multi_instance);
+  }
+
+  /**
+   * Make sure the field label is visible only once.
+   */
+  function testFieldLabelVisibleOnce() {
+    $langcode = LANGUAGE_NONE;
+
+    $this->drupalGet('node/add/page');
+    $this->assertLabelVisibleOnce($this->single_field_name, "edit-{$this->single_field_name}-{$langcode}-select");
+    $this->assertLabelVisibleOnce($this->multi_field_name, "edit-{$this->multi_field_name}-{$langcode}-select");
   }
 
   /**

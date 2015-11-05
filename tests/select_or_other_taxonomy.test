@@ -3,7 +3,7 @@
 /**
  * Tests the select or other taxonomy field based functionality
  */
-class SelectOrOtherTaxonomyTestCase extends DrupalWebTestCase {
+class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
   protected $privileged_user;
   protected $fields;
 
@@ -76,6 +76,21 @@ class SelectOrOtherTaxonomyTestCase extends DrupalWebTestCase {
       );
 
       field_create_instance($instance_settings);
+    }
+  }
+
+  /**
+   * Make sure the field label is visible only once.
+   */
+  function testFieldLabelVisibleOnce() {
+    $langcode = LANGUAGE_NONE;
+
+
+    foreach ($this->fields as $cardinality => $fields) {
+      foreach ($fields as $field) {
+        $this->drupalGet('node/add/page');
+        $this->assertLabelVisibleOnce($field['field_name'], "edit-{$field['field_name']}-{$langcode}-select");
+      }
     }
   }
 

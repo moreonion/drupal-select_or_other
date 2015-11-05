@@ -3,7 +3,7 @@
 /**
  * Tests administration of select or other field widgets and formatters.
  */
-class SelectOrOtherAdminTestCase extends DrupalWebTestCase {
+class SelectOrOtherAdminTestCase extends SelectOrOtherTestBase {
 
   /**
    * @var object

@@ -3,7 +3,7 @@
 /**
  * Tests the select or other text field based functionality
  */
-class SelectOrOtherNumberTestCase extends DrupalWebTestCase {
+class SelectOrOtherNumberTestCase extends SelectOrOtherTestBase {
   protected $privileged_user;
   protected $field_options;
 
@@ -86,6 +86,22 @@ class SelectOrOtherNumberTestCase extends DrupalWebTestCase {
         );
 
         field_create_instance($instance_settings);
+      }
+    }
+  }
+
+  /**
+   * Make sure the field label is visible only once.
+   */
+  function testFieldLabelVisibleOnce() {
+    $langcode = LANGUAGE_NONE;
+
+    foreach ($this->field_options as $cardinality => $field_types) {
+      foreach ($field_types as $type => $field_names) {
+        foreach (array_keys($field_names) as $field_name) {
+          $this->drupalGet('node/add/page');
+          $this->assertLabelVisibleOnce($field_name, "edit-{$field_name}-{$langcode}-select");
+        }
       }
     }
   }
