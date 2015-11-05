@@ -73,7 +73,7 @@ function select_or_other_field_widget_settings_form($field, $instance) {
       '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.'),
       '#default_value' => isset($settings['available_options']) ? $settings['available_options'] : '',
     );
-    if($provided_available_options){
+    if ($provided_available_options) {
       $form['provided_available_options'] = array(
         '#type' => 'textarea',
         '#disabled' => TRUE,
@@ -289,30 +289,40 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   if (is_array($value) && isset($value['select_or_other'])) {
     // This is a multiselect which uses associated arrays.
     unset($value['select_or_other']);
-    $value  += _fetch_other_value($element);
+    $value += _fetch_other_value($element);
   }
   elseif ($value === 'select_or_other') {
     // This is a single select which uses strings.
     $other_value = _fetch_other_value($element, FALSE);
     if (!$other_value) {
-      form_error($element['other'], t('!name: !title is required', array('!name' => t($element['select']['#title']), '!title' => $element['#other'])));
+      form_error($element['other'], t('!name: !title is required', array(
+        '!name' => t($element['select']['#title']),
+        '!title' => $element['#other']
+      )));
     }
-    else{}
-      $value = $other_value;
+    else {
+    }
+    $value = $other_value;
   }
 
   if ($value !== "") {
-    if (in_array($element['#field_widget'], array('select_or_other', 'select_or_other_buttons'))) {
+    if (in_array($element['#field_widget'], array(
+      'select_or_other',
+      'select_or_other_buttons'
+    ))) {
       // Filter out 'none' value (if present, will always be in key 0)
       if (isset($items[0]['value']) && $items[0]['value'] === '') {
         unset($items[0]);
       }
       if ($element['#multiple'] >= 2 && count($value) > $element['#multiple']) {
-        form_error($element['select'], t('!name: cannot hold more than @count values.', array('!name' => t($element['select']['#title']), '@count' => $element['#multiple'])));
+        form_error($element['select'], t('!name: cannot hold more than @count values.', array(
+          '!name' => t($element['select']['#title']),
+          '@count' => $element['#multiple']
+        )));
       }
       $delta = 0;
       $values = array();
-      foreach ((array)$value as $v) {
+      foreach ((array) $value as $v) {
         if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v) && $v != '_none') {
           form_error($element, t('!name field must be a valid integer.', array('!name' => t($element['select']['#title']))));
           break;
@@ -322,7 +332,10 @@ function select_or_other_field_widget_validate($element, &$form_state) {
           break;
         }
         elseif ($field_info['type'] == 'text' && drupal_strlen($v) > $field_info['settings']['max_length']) {
-          form_error($element, t('!name field must be a string at most @max characters long.', array('!name' => t($element['select']['#title']), '@max' => $field_info['settings']['max_length'])));
+          form_error($element, t('!name field must be a string at most @max characters long.', array(
+            '!name' => t($element['select']['#title']),
+            '@max' => $field_info['settings']['max_length']
+          )));
           break;
         }
 
@@ -421,7 +434,7 @@ function select_or_other_taxonomy_validate($element, &$form_state) {
   // Get the selected tags and unset the select_or_other option.
   $tags = drupal_map_assoc((array) $element['select']['#value']);
   // Get the other value and prepare it for processing.
-  if(isset($tags['select_or_other'])){
+  if (isset($tags['select_or_other'])) {
     unset($tags['select_or_other']);
     $tags += drupal_explode_tags($element['other']['#value']);
   }
@@ -442,7 +455,11 @@ function select_or_other_taxonomy_validate($element, &$form_state) {
     foreach ($tags as $tag) {
       // See if the term exists in the chosen vocabulary and return the tid;
       // otherwise, create a new 'autocreate' term for insert/update.
-      if ($possibilities = taxonomy_term_load_multiple(array(), array('name' => trim($tag), 'vid' => array_keys($vocabularies)))) {
+      if ($possibilities = taxonomy_term_load_multiple(array(), array(
+        'name' => trim($tag),
+        'vid' => array_keys($vocabularies)
+      ))
+      ) {
         $term = (array) array_pop($possibilities);
       }
       else {
@@ -454,7 +471,7 @@ function select_or_other_taxonomy_validate($element, &$form_state) {
           'vocabulary_machine_name' => $vocabulary->machine_name,
         );
       }
-      if ($term['tid'] !== 'autocreate'){
+      if ($term['tid'] !== 'autocreate') {
         $value[$term['tid']] = $term;
       }
       else {
@@ -505,7 +522,7 @@ function _select_or_other_field_widget_get_available_options($instance, $field) 
  * @return array
  *  Available options.
  */
-function _select_or_other_invoke_available_options($instance){
+function _select_or_other_invoke_available_options($instance) {
   $entity_type = $instance['entity_type'];
   $bundle = $instance['bundle'];
   $field_name = $instance['field_name'];
@@ -537,28 +554,28 @@ function _select_or_other_options_form_to_storage($value) {
 /**
  * Helper function to retrieve the other value from an element.
  */
-function _fetch_other_value($element, $return_array = TRUE){
+function _fetch_other_value($element, $return_array = TRUE) {
   $other_value = array();
 
   if ($element['other']['#value']) {
     // If the value in the other element was already a valid option, we want to
     // store that value instead of the one in the other field.
     foreach ($element['#options'] as $key => $option) {
-      if($element['other']['#value'] === $option){
+      if ($element['other']['#value'] === $option) {
         $other_value[$key] = $option;
         break;
       }
     }
 
-    if (!$other_value){
+    if (!$other_value) {
       $other_value[$element['other']['#value']] = $element['other']['#value'];
     }
   }
 
-  if ($return_array){
+  if ($return_array) {
     return $other_value;
   }
-  else{
+  else {
     $keys = array_keys($other_value);
     return array_pop($keys);
   }

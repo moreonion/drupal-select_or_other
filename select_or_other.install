@@ -16,7 +16,7 @@ function select_or_other_install() {
     ->condition('name', 'text', '=')
     ->execute()
     ->fetchField();
-  
+
   db_update('system')
     ->fields(array('weight' => $weight + 1))
     ->condition('type', 'module')
@@ -35,7 +35,7 @@ function select_or_other_update_7201() {
     ->condition('name', 'text', '=')
     ->execute()
     ->fetchField();
-  
+
   db_update('system')
     ->fields(array('weight' => $weight + 1))
     ->condition('type', 'module')
