@@ -33,7 +33,7 @@ function select_or_other_field_formatter_view($entity_type, $entity, $field, $in
       $temp_options = array();
       foreach ($field_options as $field_item) {
         $exploded = explode('|', $field_item);
-        $temp_options[$exploded[0]] = $exploded[1];
+        $temp_options[$exploded[0]] = isset($exploded[1]) ? $exploded[1] : $exploded[0];
       }
       $field_options = $temp_options;
     }
