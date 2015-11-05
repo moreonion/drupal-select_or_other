@@ -305,12 +305,12 @@ function select_or_other_field_widget_settings_form($field, $instance) {
   if ($field['type'] != 'taxonomy_term_reference') {
     $form['other_unknown_defaults'] = array(
       '#type' => 'select',
-      '#title' => t('<em>Other</em> value as default value'),
-      '#description' => t("If any incoming default values do not appear in <em>available options</em> (i.e. set as <em>other</em> values), what should happen?"),
+      '#title' => t("Behaviour of 'Other' value when editing existing content."),
+      '#description' => t("What should happen if the 'Other' option was used to enter a new value in this field and the user later visits the edit form?"),
       '#options' => array(
-        'other' => t('Add the values to the other textfield'),
-        'append' => t('Append the values to the current list'),
-        'available' => t('Append the values to the available options'),
+        'other' => t('Add the values to the other field'),
+        'append' => t('Add the values to the list of choices for the specific entity (i.e. node)'),
+        'available' => t('Add the values to the list of choices for all entities (i.e. nodes) using this field'),
         'ignore' => t('Ignore the values'),
       ),
       '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
