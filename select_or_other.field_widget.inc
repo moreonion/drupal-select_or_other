@@ -72,6 +72,7 @@ function select_or_other_field_widget_settings_form($field, $instance) {
       '#title' => t('Available options'),
       '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.'),
       '#default_value' => isset($settings['available_options']) ? $settings['available_options'] : '',
+      '#element_validate' => array('select_or_other_widget_settings_form_validate'),
     );
     if ($provided_available_options) {
       $form['provided_available_options'] = array(
@@ -139,6 +140,19 @@ function select_or_other_field_widget_settings_form($field, $instance) {
   );
   */
   return $form;
+}
+
+/**
+ * Validation callback for select_or_other_widget_settings fields.
+ */
+function select_or_other_widget_settings_form_validate($element, &$form_state) {
+  $values = explode("\n", $element['#value']);
+  foreach ($values as $key => $value) {
+    if (empty($value)) {
+      unset($values[$key]);
+    }
+  }
+  form_set_value($element, implode($values), $form_state);
 }
 
 /**
