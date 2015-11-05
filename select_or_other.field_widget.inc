@@ -146,13 +146,16 @@ function select_or_other_field_widget_settings_form($field, $instance) {
  * Validation callback for select_or_other_widget_settings fields.
  */
 function select_or_other_widget_settings_form_validate($element, &$form_state) {
-  $values = explode("\n", $element['#value']);
-  foreach ($values as $key => $value) {
-    if (empty($value)) {
-      unset($values[$key]);
+  // Remove empty lines to prevent notices.
+  if ($element['#name'] === 'instance[widget][settings][available_options]') {
+    $values = explode("\n", $element['#value']);
+    foreach ($values as $key => $value) {
+      if (empty($value)) {
+        unset($values[$key]);
+      }
     }
+    form_set_value($element, implode($values), $form_state);
   }
-  form_set_value($element, implode($values), $form_state);
 }
 
 /**
