@@ -154,7 +154,7 @@ function select_or_other_widget_settings_form_validate($element, &$form_state) {
         unset($values[$key]);
       }
     }
-    form_set_value($element, implode($values), $form_state);
+    form_set_value($element, implode("\n", $values), $form_state);
   }
 }
 
