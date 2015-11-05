@@ -265,7 +265,6 @@ function theme_select_or_other_none($variables) {
       break;
 
     case 'select_or_other':
-    case 'select_or_other_sort':
       if (!empty($variables['option']) && $variables['option'] == 'option_none') {
         $output = t('- None -');
       }

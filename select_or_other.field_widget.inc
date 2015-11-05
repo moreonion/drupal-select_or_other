@@ -34,16 +34,6 @@ function select_or_other_field_widget_info() {
       'settings' => $settings,
       'weight' => 2,
     ),
-    'select_or_other_sort' => array(
-      'label' => t('Select (or other) drag and drop lists [deprecated in favor of Field Collection]'),
-      'field types' => $field_types,
-      'behaviors' => array(
-        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
-        'default value' => FIELD_BEHAVIOR_DEFAULT,
-      ),
-      'settings' => $settings,
-      'weight' => 2,
-    ),
     'select_or_other_buttons' => array(
       'label' => t('Select (or other) check boxes/radio buttons'),
       'field types' => $field_types,
@@ -196,12 +186,6 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
       $element['#select_type'] = 'select';
       break;
 
-    case 'select_or_other_sort':
-      $element['#select_type'] = 'select';
-      // Also disable multiples for this select type.
-      $element['#multiple'] = FALSE;
-      break;
-
     case 'select_or_other_buttons':
       $element['#select_type'] = $field['cardinality'] == 1 ? 'radios' : 'checkboxes';
       break;
@@ -245,8 +229,7 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
   }
 
   $required = (isset($instance['required']) && $instance['required']);
-  $multiple = (($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1)
-    || ($instance['widget']['type'] == 'select_or_other_sort'));
+  $multiple = ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] == -1);
   $multiple_checkbox = ($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] == -1);
 
   $empty_option = array('_none' => theme('select_or_other_none', array('instance' => $instance)));
@@ -359,9 +342,6 @@ function select_or_other_field_widget_validate($element, &$form_state) {
         $values[$delta++]['value'] = $v;
       }
       $value = $values;
-    }
-    elseif ($element['#field_widget'] == 'select_or_other_sort') {
-      $value = array('value' => $value);
     }
 
     // @todo Align with Drupal core select list, NULL (-None-) value.
