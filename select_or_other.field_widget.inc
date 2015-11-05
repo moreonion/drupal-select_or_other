@@ -301,10 +301,21 @@ function select_or_other_field_widget_settings_form($field, $instance) {
 /**
  * Validate callback for a Select (or other) field widget settings form.
  */
-function select_or_other_field_widget_settings_validate($element, &$form_state, $form) {
+function select_or_other_field_widget_settings_validate($element, &$form_state) {
   $settings = &$form_state['values']['instance']['widget']['settings'];
   if (empty($settings['available_options']) && empty($settings['available_options_php'])) {
     form_set_error(implode('][', $element['#parents']), t('You must provide <em>Available options</em>.'));
+  }
+
+  // Remove empty lines to prevent notices.
+  if ($element['#name'] === 'instance[widget][settings][available_options]') {
+    $values = explode("\n", $element['#value']);
+    foreach ($values as $key => $value) {
+      if (empty($value)) {
+        unset($values[$key]);
+      }
+    }
+    form_set_value($element, implode($values), $form_state);
   }
 }
 
