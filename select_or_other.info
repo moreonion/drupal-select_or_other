@@ -5,6 +5,5 @@ package = Fields
 
 files[] = tests/select_or_other_admin.test
 files[] = tests/select_or_other_number.test
-files[] = tests/select_or_other_taxonomy.test
 files[] = tests/select_or_other_text.test
 files[] = tests/SelectOrOtherTestBase.test
