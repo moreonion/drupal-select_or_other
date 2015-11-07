@@ -19,6 +19,7 @@ function select_or_other_field_widget_info() {
     'available_options' => '',
     'other' => t('Other'),
     'other_title' => '',
+    'other_unknown_new_option' => FALSE,
     'other_unknown_defaults' => 'other',
     'other_size' => 60,
   );
@@ -68,14 +69,19 @@ function select_or_other_field_widget_settings_form($field, $instance) {
     '#element_validate' => array('element_validate_integer_positive'),
   );
 
+  $form['other_unknown_new_option'] = array(
+    '#type' => 'checkbox',
+    '#title' => t("Add 'Other' value to the list of choices for this field."),
+    '#default_value' => $settings['other_unknown_new_option'],
+  );
+
   $form['other_unknown_defaults'] = array(
-    '#type' => 'select',
+    '#type' => 'radios',
     '#title' => t("Behaviour of 'Other' value when editing existing content."),
     '#description' => t("What should happen if the 'Other' option was used to enter a new value in this field and the user later visits the edit form?"),
     '#options' => array(
       'other' => t('Add the values to the other field'),
       'append' => t('Add the values to the list of choices for the specific entity (i.e. node)'),
-      'available' => t('Add the values to the list of choices for all entities (i.e. nodes) using this field'),
     ),
     '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
     '#required' => TRUE,
@@ -280,25 +286,25 @@ function select_or_other_field_widget_validate($element, &$form_state) {
   }
 
   // Add values to available options is configured to do so.
-  if (!empty($form_state['field'][$field_name][$element['#parents'][1]]['instance'])) {
-    $instance = $form_state['field'][$field_name][$element['#parents'][1]]['instance'];
-  }
-  else {
-    $instance = field_widget_instance($element, $form_state);
-  }
+  $instance = field_widget_instance($element, $form_state);
+  if ($instance['widget']['settings']['other_unknown_new_option']) {
+    $other_value = _fetch_other_value($element);
+    $append = array();
 
-  if (isset($instance['widget']['settings']['other_unknown_defaults'])
-    && $instance['widget']['settings']['other_unknown_defaults'] == 'available'
-  ) {
-    if (
-      ($element['select']['#value'] == 'select_or_other' || (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other']))) &&
-      !empty($element['other']['#value']) &&
-      !isset($element['#options'][$element['other']['#value']])
-    ) {
+    if (!empty($other_value)) {
+      foreach ($other_value as $key => $value) {
+        if (!isset($element['#options'][$key])) {
+          $append[] = $value;
+        }
+      }
+
+    }
+
+    if (!empty($append)) {
       // Get the latest instance.
       $instance = field_read_instance($instance['entity_type'], $instance['field_name'], $instance['bundle']);
       // Make the change.
-      $instance['widget']['settings']['available_options'] .= "\n" . $element['other']['#value'];
+      $instance['widget']['settings']['available_options'] .= "\n" . implode("\n", $append);
       // Save the instance.
       field_update_instance($instance);
     }
