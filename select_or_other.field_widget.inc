@@ -76,7 +76,6 @@ function select_or_other_field_widget_settings_form($field, $instance) {
       'other' => t('Add the values to the other field'),
       'append' => t('Add the values to the list of choices for the specific entity (i.e. node)'),
       'available' => t('Add the values to the list of choices for all entities (i.e. nodes) using this field'),
-      'ignore' => t('Ignore the values'),
     ),
     '#default_value' => isset($settings['other_unknown_defaults']) ? $settings['other_unknown_defaults'] : 'other',
     '#required' => TRUE,
