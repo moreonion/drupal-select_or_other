@@ -216,8 +216,9 @@ function select_or_other_field_widget_form_prepare_option(&$options, $key, $opt)
   if (empty($opt)) {
     return;
   }
-  // Sanitize the user input with a permissive filter.
-  $opt = filter_xss($opt);
+  // Sanitize the user input with a permissive filter
+  // and convert special characters.
+  $opt = html_entity_decode(filter_xss($opt));
   // If option has a key specified
   if (strpos($opt, '|') !== FALSE) {
     list($key, $value) = explode('|', $opt);
