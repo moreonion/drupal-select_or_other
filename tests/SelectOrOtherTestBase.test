@@ -65,6 +65,53 @@ class SelectOrOtherTestBase extends DrupalWebTestCase {
   }
 
   /**
+   * Make sure an empty option is present when relevant.
+   */
+  function testEmptyOption($other_option = '') {
+    foreach ($this->fields as $field_name => $field) {
+      $this->drupalGet('node/add/' . $this->getFieldContentType($field_name));
+      $type = $this->getWidgetType($field_name);
+      $multiple = $field['cardinality'] !== 1;
+      $required = $field['instance_settings']['required'];
+
+      // First test empty behaviour. Only single select boxes should always have
+      // an empty value.
+      if ($type === 'select' && !$multiple){
+        if ($required) {
+          $this->assertText(t('- Select -'));
+        }
+        else{
+          $this->assertText(t('- None -'));
+        }
+      }
+      else{
+        $this->assertNoText(t('- Select -'));
+        $this->assertNoText(t('- None -'));
+      }
+
+      // Test non-empty behaviour. Once again only single cardinality elements
+      // should have empty options to allow for the removal of values if the
+      // field is not required.
+      if ($other_option !== '') {
+        // We set the other option, because we can set that in the same way
+        // always.
+        $this->setFieldValue($field_name, 'select_or_other', $other_option);
+        $this->clickLink(t('Edit'));
+        if (!$multiple && !$required) {
+          $this->assertText(t('- None -'));
+        }
+        else{
+          $this->assertNoText(t('- Select -'));
+          $this->assertNoText(t('- None -'));
+        }
+      }
+      else {
+        $this->fail('No $other_option provided, this test should be overridden and calling itself from individual test classes.');
+      }
+    }
+  }
+
+  /**
    * Generate content types and fields for testing.
    * @param string $field_type
    *   The type of field to create.
@@ -81,41 +128,44 @@ class SelectOrOtherTestBase extends DrupalWebTestCase {
     // Configure fields.
     foreach ($widgets as $widget) {
       foreach (array(1, -1) as $cardinality) {
-        $content_type = $this->drupalCreateContentType();
-        $field_info = array(
-          'content_type' => $content_type,
-          'widget' => $widget,
-          'cardinality' => $cardinality,
-        );
+        foreach (array(TRUE, FALSE) as $required) {
+          $content_type = $this->drupalCreateContentType();
+          $field_info = array(
+            'content_type' => $content_type,
+            'widget' => $widget,
+            'cardinality' => $cardinality,
+          );
 
-        // Create the field.
-        $field = array(
-          'type' => $field_type,
-          'field_name' => strtolower($this->randomName()),
-          'cardinality' => $cardinality,
-          'settings' => $field_settings,
-        );
-        field_create_field($field);
-        $field_info['field_settings'] = $field;
+          // Create the field.
+          $field = array(
+            'type' => $field_type,
+            'field_name' => strtolower($this->randomName()),
+            'cardinality' => $cardinality,
+            'settings' => $field_settings,
+          );
+          field_create_field($field);
+          $field_info['field_settings'] = $field;
 
-        $instance_settings = array(
-          'entity_type' => 'node',
-          'bundle' => $field_info['content_type']->name,
-          'field_name' => $field['field_name'],
-          'widget' => array(
-            'type' => $widget,
-            'settings' => $widget_settings,
-          ),
-          'display' => array(
-            'full' => array(
-              'type' => $field_formatter,
+          $instance_settings = array(
+            'entity_type' => 'node',
+            'required' => $required,
+            'bundle' => $field_info['content_type']->name,
+            'field_name' => $field['field_name'],
+            'widget' => array(
+              'type' => $widget,
+              'settings' => $widget_settings,
             ),
-          ),
-        );
+            'display' => array(
+              'full' => array(
+                'type' => $field_formatter,
+              ),
+            ),
+          );
 
-        field_create_instance($instance_settings);
-        $field_info['instance_settings'] = $instance_settings;
-        $this->fields[$field['field_name']] = $field_info;
+          field_create_instance($instance_settings);
+          $field_info['instance_settings'] = $instance_settings;
+          $this->fields[$field['field_name']] = $field_info;
+        }
       }
     }
 
@@ -143,10 +193,7 @@ class SelectOrOtherTestBase extends DrupalWebTestCase {
     }
     else {
       // We have to treat multiple selection elements differently.
-      $xpath = "//select[@id = :id]";
-      $arguments = array(':id' => "edit-{$field_name}-und-select");
-      $elements = $this->xpath($xpath, $arguments);
-      if (count($elements)) {
+      if ($this->getWidgetType($field_name) === 'select') {
         // We're dealing with a multiple select.
         $edit["{$field_name}[und][select][]"] = $select;
       }
@@ -161,6 +208,20 @@ class SelectOrOtherTestBase extends DrupalWebTestCase {
 
     // Create the node.
     $this->drupalPost(NULL, $edit, t('Save'));
+  }
+
+  protected function getWidgetType($field_name) {
+    $xpath = "//select[@id = :id]";
+    $arguments = array(':id' => "edit-{$field_name}-und-select");
+    $elements = $this->xpath($xpath, $arguments);
+
+    // we are dealing with a select widget.
+    if (count($elements)) {
+      return 'select';
+    }
+    else{
+      return 'buttons';
+    }
   }
 
   protected function getFieldContentType($field_name) {

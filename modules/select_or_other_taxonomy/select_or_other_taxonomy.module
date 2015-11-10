@@ -43,15 +43,30 @@ function select_or_other_taxonomy_field_widget_settings_form($field, $instance) 
  * Implements hook_field_widget_form().
  */
 function select_or_other_taxonomy_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $element = $element + select_or_other_field_widget_form($form, $form_state, $field, $instance, $langcode, $items, $delta, $element);
-
-  $element['#options'] = module_exists('i18n_taxonomy') ? i18n_taxonomy_allowed_values($field) : taxonomy_allowed_values($field);
-  $default_value = [];
+  $default_value = array();
+  // Also set some fake items to trick select_or_other_field_widget_form() into
+  // setting the correct #empty_option if applicable.
+  // @todo refactor further to be able to remove this hack.
+  $fake_items = array();
   foreach ($items as $item) {
     if ($item['tid'] !== 'autocreate') {
       $default_value[] = $item['tid'];
+      $fake_items[] = array('value' => 'fake');
     }
   }
+
+  // Get the base widget form.
+  $element = $element + select_or_other_field_widget_form($form, $form_state, $field, $instance, $langcode, $fake_items, $delta, $element);
+
+  // Make sure the empty option is set.
+  // @todo refactor further to be able to remove this hack.
+  $empty_option = array();
+  if (isset($element['#options'][''])) {
+    $empty_option[''] = $element['#options'][''];
+  }
+  $options = module_exists('i18n_taxonomy') ? i18n_taxonomy_allowed_values($field) : taxonomy_allowed_values($field);
+  $element['#options'] = $empty_option + $options;
+
   $element['#default_value'] = $field['cardinality'] != 1 ? $default_value : reset($default_value);
   $element['#element_validate'][] = 'select_or_other_taxonomy_field_widget_validate';
 
@@ -124,6 +139,10 @@ function select_or_other_taxonomy_validate($element, &$form_state) {
     foreach ($tags as $key => $tag) {
       if (is_numeric($tag)) {
         $possible_tids[] = $tag;
+        unset($tags[$key]);
+      }
+      // unset the empty value if present.
+      if ($tag == '') {
         unset($tags[$key]);
       }
     }

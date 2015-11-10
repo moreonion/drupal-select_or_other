@@ -64,4 +64,12 @@ class SelectOrOtherTextTestCase extends SelectOrOtherTestBase {
       $this->assertFieldByName("{$field_name}[und][other]", '');
     }
   }
+
+  /**
+   * Make sure an empty option is present when relevant.
+   */
+  function testEmptyOption($other_option = '') {
+    parent::testEmptyOption('My cool new value');
+  }
+
 }

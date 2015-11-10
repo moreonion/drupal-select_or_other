@@ -122,4 +122,11 @@ class SelectOrOtherNumberTestCase extends SelectOrOtherTestBase {
     return ($options);
   }
 
+  /**
+   * Make sure an empty option is present when relevant.
+   */
+  function testEmptyOption($other_option = '') {
+    parent::testEmptyOption(999);
+  }
+
 }

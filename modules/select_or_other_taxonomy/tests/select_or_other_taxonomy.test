@@ -96,7 +96,7 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
    */
   function testMultipleOther() {
     foreach ($this->fields as $field_name => $field) {
-      $other_values[] = $this->randomName();
+      $other_values = array($this->randomName());
       $other_values[] = $this->randomName();
       $other_values[] = $this->randomName();
       $other_value = implode(', ', $other_values);
@@ -129,6 +129,13 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
       $this->assertText($this->terms[1]->name);
       $this->assertNoRaw('select_or_other');
     }
+  }
+
+  /**
+   * Make sure an empty option is present when relevant.
+   */
+  function testEmptyOption($other_option = '') {
+    parent::testEmptyOption('My cool new term');
   }
 
 }

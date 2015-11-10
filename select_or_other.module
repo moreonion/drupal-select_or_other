@@ -3,9 +3,6 @@
 /**
  * @file
  * The Select (or other) module.
- *
- * This file handles the Forms API element, as well as the select_or_other_none
- * theme which is used by the field widget.
  */
 
 // Include the inc files.
@@ -19,12 +16,6 @@ function select_or_other_theme() {
   return array(
     'select_or_other' => array(
       'render element' => 'element',
-    ),
-    'select_or_other_none' => array(
-      'variables' => array(
-        'instance' => NULL,
-        'option' => NULL,
-      ),
     ),
   );
 
@@ -119,7 +110,6 @@ function select_or_other_element_process($element, &$form_state) {
       $element['select']['#default_value'],
     );
   }
-
 
   // Process the default value.
   foreach ($element['select']['#default_value'] as $key => $val) {
@@ -247,40 +237,6 @@ function select_or_other_element_validate($element, &$form_state) {
   }
 
   return $element;
-}
-
-/**
- * Returns HTML for the label for the empty value for options that are not required.
- *
- * The default theme will display N/A for a radio list and '- None -' for a select.
- *
- * @param $variables
- *   An associative array containing:
- *   - instance: An array representing the widget requesting the options.
- *   - option: An array representing the widget requesting the options.
- * @return string
- *  A HTML string for the empty value for options that are not required.
- */
-function theme_select_or_other_none($variables) {
-  $instance = $variables['instance'];
-
-  $output = '';
-  switch ($instance['widget']['type']) {
-    case 'select_or_other_buttons':
-      $output = t('N/A');
-      break;
-
-    case 'select_or_other':
-      if (!empty($variables['option']) && $variables['option'] == 'option_none') {
-        $output = t('- None -');
-      }
-      else {
-        $output = t('- Select a value -');
-      }
-      break;
-  }
-
-  return $output;
 }
 
 /**

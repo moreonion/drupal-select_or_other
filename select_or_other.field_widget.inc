@@ -131,7 +131,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
       '#other_title' => !empty($instance['widget']['settings']['other_title']) ? $instance['widget']['settings']['other_title'] : NULL,
       '#other_size' => $instance['widget']['settings']['other_size'],
       '#default_value' => $field['cardinality'] != 1 ? $default_value : reset($default_value),
-      '#options' => select_or_other_field_widget_form_prepare_options($field, $instance, !empty($items[$delta])),
+      '#options' => select_or_other_field_widget_form_prepare_options($field, $instance),
       '#description' => isset($instance['description']) ? $instance['description'] : '',
       '#multiple' => $field['cardinality'] == 1 ? FALSE : $field['cardinality'],
       '#required' => $instance['required'],
@@ -141,6 +141,25 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
       '#element_validate' => array('select_or_other_field_widget_validate'),
       '#field_widget' => $instance['widget']['type'],
     );
+
+  // Set the empty option on single option fields where applicable.
+  if ($field['cardinality'] == 1) {
+    if (strpos($instance['widget']['type'], 'buttons') === FALSE) {
+      // We are dealing with a select element.
+      if (empty($element['#default_value']) && $element['#required']) {
+          $element['#empty_option'] = t('- Select -');
+      }
+      elseif (!$element['#required']) {
+        $element['#empty_option'] = t('- None -');
+      }
+    }
+    else {
+      // This is a radios element.
+      if (!empty($element['#default_value']) && !$element['#required']) {
+        $element['#options'] = array('' => t('- None -')) + $element['#options'];
+      }
+    }
+  }
 
   if (!empty($field['settings']['max_length'])) {
     $element['#maxlength'] = $field['settings']['max_length'];
@@ -163,7 +182,7 @@ function select_or_other_field_widget_form(&$form, &$form_state, $field, $instan
 /**
  * Prepare options for the widget list.
  */
-function select_or_other_field_widget_form_prepare_options($field, $instance, $has_value = FALSE) {
+function select_or_other_field_widget_form_prepare_options($field, $instance) {
   $options = array();
 
   $list = _select_or_other_field_widget_get_available_options($instance, $field);
@@ -178,27 +197,6 @@ function select_or_other_field_widget_form_prepare_options($field, $instance, $h
     }
     else {
       select_or_other_field_widget_form_prepare_option($options, $key, $opt);
-    }
-  }
-
-  $required = (isset($instance['required']) && $instance['required']);
-  $multiple = ($instance['widget']['type'] == 'select_or_other' && $field['cardinality'] !== 1);
-  $multiple_checkbox = ($instance['widget']['type'] == 'select_or_other_buttons' && $field['cardinality'] !== 1);
-
-  $empty_option = array('_none' => theme('select_or_other_none', array('instance' => $instance)));
-  // Multiple select.
-  if ($multiple) {
-    // Add a 'none' option for non-required fields.
-    if (!$required) {
-      $options = $empty_option + $options;
-    }
-  }
-  // Single select.
-  elseif (!$multiple_checkbox) {
-    // Add a 'none' option for non-required fields, and a 'select a value'
-    // option for required fields that do not come with a value selected.
-    if (!$required) {
-      $options = $empty_option + $options;
     }
   }
 
@@ -254,7 +252,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     $delta = 0;
     $values = array();
     foreach ((array) $value as $v) {
-      if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v) && $v != '_none') {
+      if ($field_info['type'] == 'number_integer' && !preg_match('/^-?\d+$/', $v)) {
         form_error($element, t('!name field must be a valid integer.', array('!name' => t($element['select']['#title']))));
         break;
       }
@@ -273,10 +271,6 @@ function select_or_other_field_widget_validate($element, &$form_state) {
       $values[$delta++]['value'] = $v;
     }
     $value = $values;
-
-    // @todo Align with Drupal core select list, NULL (-None-) value.
-    // http://drupal.org/node/1830090
-    $value = _select_or_other_options_form_to_storage($value);
 
     form_set_value($element, $value, $form_state);
     $form_state['clicked_button']['#post'][$element['#name']] = $value; // Is this something we should do?
@@ -357,21 +351,6 @@ function _select_or_other_invoke_available_options($instance) {
     }
   }
   return $available_options;
-}
-
-/**
- * Transforms submitted form values into field storage format.
- * Align with Drupal core select list, NULL (-None-) value.
- * http://drupal.org/node/1830090
- */
-function _select_or_other_options_form_to_storage($value) {
-  if (isset($value[0])) {
-    $index = array_search('_none', $value[0], TRUE);
-    if ($index !== FALSE) {
-      unset($value[0][$index]);
-    }
-  }
-  return $value;
 }
 
 function select_or_other_fetch_value($element) {
