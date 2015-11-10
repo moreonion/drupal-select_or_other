@@ -4,8 +4,8 @@
  * Tests the select or other taxonomy field based functionality
  */
 class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
-  protected $privileged_user;
-  protected $fields;
+  protected $vocabulary;
+  protected $terms;
 
   public static function getInfo() {
     return array(
@@ -15,143 +15,67 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
     );
   }
 
-  public function setUp() {
-    parent::setUp(array('select_or_other_taxonomy'));
-
-    // Start with a clean slate
-    $this->fields = array();
-    // Configure fields.
-    foreach (array('select_or_other_taxonomy', 'select_or_other_taxonomy_buttons') as $widget) {
-      foreach (array('single', 'multiple') as $cardinality) {
-        $field = array(
-          'content_type' => $this->drupalCreateContentType(),
-        );
-
-        // Create vocabularies.
-        $name = $this->randomName();
-        $vocab = (object) array(
-          'name' => $name,
-          'machine_name' => strtolower($name),
-        );
-        taxonomy_vocabulary_save($vocab);
-        $vocab = taxonomy_vocabulary_machine_name_load(strtolower($name));
-        $field['vocabulary'] = $vocab;
-
-        // Add initial term to vocabulary.
-        $term = (object) array(
-          'vid' => $vocab->vid,
-          'name' => $this->randomName(),
-        );
-        taxonomy_term_save($term);
-        $field['terms'][] = $term;
-
-        // Add another term to vocabulary.
-        $term = (object) array(
-          'vid' => $vocab->vid,
-          'name' => $this->randomName(),
-          'parent' => $term->tid,
-        );
-        taxonomy_term_save($term);
-        $field['terms'][] = $term;
-
-        // Create the field.
-        $field_settings = array(
-          'type' => 'taxonomy_term_reference',
-          'field_name' => strtolower($this->randomName()),
-          'cardinality' => $cardinality === 'single' ? 1 : -1,
-          'settings' => array(
-            'allowed_values' => array(
-              array(
-                'vocabulary' => strtolower($name),
-                'parent' => '0',
-              ),
-            ),
-          ),
-        );
-        field_create_field($field_settings);
-        $field['field_name'] = $field_settings['field_name'];
-        $field['field_settings'] = $field_settings;
-
-        $instance_settings = array(
-          'entity_type' => 'node',
-          'bundle' => $field['content_type']->name,
-          'field_name' => $field_settings['field_name'],
-          'widget' => array(
-            'type' => $widget,
-          ),
-          'display' => array(
-            'full' => array(
-              'type' => 'taxonomy_term_reference_plain',
-            ),
-          ),
-        );
-
-        field_create_instance($instance_settings);
-        $field['instance_settings'] = $instance_settings;
-        $this->fields[$widget][$cardinality] = $field;
-      }
+  protected function createTerm($parent = NULL, $name = '', $vocabulary_machine_name = '') {
+    if ($vocabulary_machine_name == '' && empty($this->vocabulary)) {
+      $this->vocabulary = $this->createVocabulary();
     }
 
-    // Determine required permissions.
-    $permissions = array('create page content', 'edit own page content');
-    foreach ($this->fields as $fields) {
-      foreach ($fields as $field) {
-        $permissions[] = "create {$field['content_type']->name} content";
-        $permissions[] = "edit own {$field['content_type']->name} content";
-      }
+    // Add initial term to vocabulary.
+    $term = (object) array(
+      'vid' => $this->vocabulary->vid,
+      'name' => $name !== '' ? $name : $this->randomName(),
+    );
+    if (isset($parent)) {
+      $term->parent = $parent;
     }
-    // Create and log in our privileged user.
-    $this->privileged_user = $this->drupalCreateUser($permissions);
-    $this->drupalLogin($this->privileged_user);
+    taxonomy_term_save($term);
+
+    return $term;
   }
 
-  /**
-   * Make sure the field label is visible only once.
-   */
-  function testFieldLabelVisibleOnce() {
-    $langcode = LANGUAGE_NONE;
+  protected function createVocabulary() {
+    // Create vocabularies.
+    $name = $this->randomName();
+    $vocab = (object) array(
+      'name' => $name,
+      'machine_name' => strtolower($name),
+    );
 
-    foreach ($this->fields as $cardinality => $fields) {
-      foreach ($fields as $field) {
-        $this->drupalGet('node/add/' . $field['content_type']->name);
-        $this->assertLabelVisibleOnce($field['field_name'], "edit-{$field['field_name']}-{$langcode}-select");
-      }
-    }
+    taxonomy_vocabulary_save($vocab);
+    return taxonomy_vocabulary_machine_name_load(strtolower($name));
+  }
+
+  public function setUp() {
+    parent::setUp(array('select_or_other_taxonomy'));
+    // Start with a clean slate.
+    $this->vocabulary = NULL;
+    // Create some terms.
+    $this->terms = array();
+    $this->terms[] = $this->createTerm();
+    $this->terms[] = $this->createTerm(reset($this->terms)->tid);
+
+    $widgets = array('select_or_other_taxonomy', 'select_or_other_taxonomy_buttons');
+    $field_settings = array(
+      'allowed_values' => array(
+        array(
+          'vocabulary' => $this->vocabulary->machine_name,
+          'parent' => '0',
+        ),
+      ),
+    );
+
+    $this->prepareTestFields('taxonomy_term_reference', $field_settings, $widgets, array(), 'taxonomy_term_reference_plain');
+    $this->drupalLogin($this->drupalCreateUser($this->defaultPermissions));
   }
 
   /**
    * Tests Select or Other without "other" selected.
    */
   function testNoOtherSelected() {
-    $langcode = LANGUAGE_NONE;
-
-    foreach ($this->fields as $widget => $fields) {
-      foreach ($fields as $cardinality => $field) {
-        $edit = array();
-        // A node requires a title
-        $edit["title"] = $this->randomName(8);
-        $term = $field['terms'][0];
-        if ($cardinality === 'single') {
-          // Test single select.
-          $edit["{$field['field_name']}[{$langcode}][select]"] = $term->tid;
-        }
-        else {
-          // Test multi select.
-          if ($widget === 'select_or_other_taxonomy') {
-            $edit["{$field['field_name']}[{$langcode}][select][]"] = $term->tid;
-          }
-          else {
-            $edit["{$field['field_name']}[{$langcode}][select][{$term->tid}]"] = $term->tid;
-          }
-        }
-        // Create the node.
-        $this->drupalPost('node/add/' . $field['content_type']->name, $edit, t('Save'));
-
-        // Check if the value has been created.
-        $this->assertRaw($term->name);
-        // Check if the 'select_or_other' option is not displayed.
-        $this->assertNoRaw('select_or_other');
-      }
+    foreach ($this->fields as $field_name => $field) {
+      $this->setFieldValue($field_name, $this->terms[0]->tid);
+      $this->assertText($this->terms[0]->name);
+      $this->assertNoRaw('select_or_other');
     }
   }
 
@@ -159,37 +83,11 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
    * Test Select or Other with "other" selected.
    */
   function testOther() {
-    $langcode = LANGUAGE_NONE;
-
-    foreach ($this->fields as $widget => $fields) {
-      foreach ($fields as $cardinality => $field) {
-        $edit = array();
-        // A node requires a title
-        $edit["title"] = $this->randomName(8);
-        $other = $this->randomName();
-        if ($cardinality === 'single') {
-          // Test single select.
-          $edit["{$field['field_name']}[{$langcode}][select]"] = 'select_or_other';
-          $edit["{$field['field_name']}[{$langcode}][other]"] = $other;
-        }
-        else {
-          // Test multi select.
-          if ($widget === 'select_or_other_taxonomy') {
-            $edit["{$field['field_name']}[{$langcode}][select][]"] = 'select_or_other';
-          }
-          else {
-            $edit["{$field['field_name']}[{$langcode}][select][select_or_other]"] = 'select_or_other';
-          }
-          $edit["{$field['field_name']}[{$langcode}][other]"] = $other;
-        }
-        // Create the node.
-        $this->drupalPost('node/add/' . $field['content_type']->name, $edit, t('Save'));
-
-        // Check if the value has been created.
-        $this->assertRaw($other);
-        // Check if the 'select_or_other' option is not displayed.
-        $this->assertNoRaw('select_or_other');
-      }
+    foreach ($this->fields as $field_name => $field) {
+      $other_value = $this->randomName();
+      $this->setFieldValue($field_name, 'select_or_other', $other_value);
+      $this->assertRaw($other_value);
+      $this->assertNoRaw('select_or_other');
     }
   }
 
@@ -197,50 +95,27 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
    * Test Select or Other with "other" selected.
    */
   function testMultipleOther() {
-    $langcode = LANGUAGE_NONE;
+    foreach ($this->fields as $field_name => $field) {
+      $other_values[] = $this->randomName();
+      $other_values[] = $this->randomName();
+      $other_values[] = $this->randomName();
+      $other_value = implode(', ', $other_values);
+      $this->setFieldValue($field_name, 'select_or_other', $other_value);
 
-    foreach ($this->fields as $widget => $fields) {
-      foreach ($fields as $cardinality => $field) {
-        $edit = array();
-        // A node requires a title
-        $edit["title"] = $this->randomName(8);
-        $other_values[] = $this->randomName();
-        $other_values[] = $this->randomName();
-        $other_values[] = $this->randomName();
-        $other = implode(', ', $other_values);
-        if ($cardinality === 'single') {
-          // Test single select.
-          $edit["{$field['field_name']}[{$langcode}][select]"] = 'select_or_other';
-          $edit["{$field['field_name']}[{$langcode}][other]"] = $other;
+      if ($field['cardinality'] === 1) {
+        // Multiple values should fail form validation.
+        $this->assertRaw(t('%name: this field cannot hold more than @count values.', array(
+          '%name' => $field_name,
+          '@count' => 1
+        )));
+      }
+      else {
+        // Check if the values have been created.
+        foreach ($other_values as $value) {
+          $this->assertRaw($value);
         }
-        else {
-          // Test multi select.
-          if ($widget === 'select_or_other_taxonomy') {
-            $edit["{$field['field_name']}[{$langcode}][select][]"] = 'select_or_other';
-          }
-          else {
-            $edit["{$field['field_name']}[{$langcode}][select][select_or_other]"] = 'select_or_other';
-          }
-          $edit["{$field['field_name']}[{$langcode}][other]"] = $other;
-        }
-        // Create the node.
-        $this->drupalPost('node/add/' . $field['content_type']->name, $edit, t('Save'));
-
-        if ($cardinality === 'single') {
-          // Multiple values should fail form validation.
-          $this->assertRaw(t('%name: this field cannot hold more than @count values.', array(
-            '%name' => $field['field_name'],
-            '@count' => 1
-          )));
-        }
-        else {
-          // Check if the values have been created.
-          foreach ($other_values as $value) {
-            $this->assertRaw($value);
-          }
-          // Check if the 'select_or_other' option is not displayed.
-          $this->assertNoRaw('select_or_other');
-        }
+        // Check if the 'select_or_other' option is not displayed.
+        $this->assertNoRaw('select_or_other');
       }
     }
   }
@@ -249,32 +124,10 @@ class SelectOrOtherTaxonomyTestCase extends SelectOrOtherTestBase {
    * Tests the selection of a term within a hierarchy.
    */
   function testTermHierarchySelect() {
-    $langcode = LANGUAGE_NONE;
-
-    // Change the widget to radio buttons/checkboxes.
-    foreach ($this->fields as $widget => $fields) {
-      foreach ($fields as $cardinality => $field) {
-        $edit = array();
-        $term = $field['terms'][1];
-        // A node requires a title
-        $edit["title"] = $this->randomName(8);
-        if ($cardinality === 'single') {
-          // Test single select.
-          $edit["{$field['field_name']}[{$langcode}][select]"] = $term->tid;
-        }
-        else {
-          // Test multi select.
-          if ($widget === 'select_or_other_taxonomy') {
-            $edit["{$field['field_name']}[{$langcode}][select][]"] = $term->tid;
-          }
-          else {
-            $edit["{$field['field_name']}[{$langcode}][select][{$term->tid}]"] = $term->tid;
-          }
-        }
-
-        $this->drupalPost('node/add/' . $field['content_type']->name, $edit, t('Save'));
-        $this->assertText($term->name);
-      }
+    foreach ($this->fields as $field_name => $field) {
+      $this->setFieldValue($field_name, $this->terms[1]->tid);
+      $this->assertText($this->terms[1]->name);
+      $this->assertNoRaw('select_or_other');
     }
   }
 

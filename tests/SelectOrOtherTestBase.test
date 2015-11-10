@@ -10,6 +10,31 @@
  */
 class SelectOrOtherTestBase extends DrupalWebTestCase {
 
+  protected $defaultPermissions;
+
+  /**
+   * @var array $fields
+   *   associated array keyed by field_name with the following information:
+   *   - Widget (machine name of the widget used)
+   *   - Cardinality (1, -1)
+   *   - field_settings @see field_info_field().
+   *   - instance_settings @see field_info_instance().
+   *
+   */
+  protected $fields;
+
+  public function setUp() {
+    // Also enable any modules required by the tests overriding this base class.
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    // At the very least enable the select_or_other module.
+    parent::setUp(array_merge(array('select_or_other'), $modules));
+    // Clear the array of fields to test.
+    $this->fields = array();
+  }
+
   /**
    * Check to see if a label is visible only once.
    * @param string $label
@@ -20,10 +45,126 @@ class SelectOrOtherTestBase extends DrupalWebTestCase {
   protected function assertLabelVisibleOnce($label, $element_name) {
     $xpath = "//label[@for[starts-with(., :element-name)] and starts-with(., :label)]";
     $arguments = array(':label' => $label, ':element-name' => $element_name);
-    $message_arguments = array('%label' => $label, '%element-name' => $element_name);
+    $message_arguments = array(
+      '%label' => $label,
+      '%element-name' => $element_name
+    );
 
     $elements = $this->xpath($xpath, $arguments);
     $this->assertEqual(count($elements), 1, t('%label is visible once for element %element', $message_arguments));
+  }
+
+  /**
+   * Make sure the field label is visible only once.
+   */
+  function testFieldLabelVisibleOnce() {
+    foreach ($this->fields as $field_name => $field) {
+      $this->drupalGet('node/add/' . $this->getFieldContentType($field_name));
+      $this->assertLabelVisibleOnce($field_name, "edit-{$field_name}-und-select");
+    }
+  }
+
+  /**
+   * Generate content types and fields for testing.
+   * @param string $field_type
+   *   The type of field to create.
+   * @param array $widgets
+   *   The types of widgets to use.
+   * @param array $widget_settings
+   *   The widget settings.
+   * @param $field_formatter
+   *   Machine name of the field formatter to use for display.
+   * @throws \Exception
+   * @throws \FieldException
+   */
+  protected function prepareTestFields($field_type, $field_settings, $widgets, $widget_settings, $field_formatter) {
+    // Configure fields.
+    foreach ($widgets as $widget) {
+      foreach (array(1, -1) as $cardinality) {
+        $content_type = $this->drupalCreateContentType();
+        $field_info = array(
+          'content_type' => $content_type,
+          'widget' => $widget,
+          'cardinality' => $cardinality,
+        );
+
+        // Create the field.
+        $field = array(
+          'type' => $field_type,
+          'field_name' => strtolower($this->randomName()),
+          'cardinality' => $cardinality,
+          'settings' => $field_settings,
+        );
+        field_create_field($field);
+        $field_info['field_settings'] = $field;
+
+        $instance_settings = array(
+          'entity_type' => 'node',
+          'bundle' => $field_info['content_type']->name,
+          'field_name' => $field['field_name'],
+          'widget' => array(
+            'type' => $widget,
+            'settings' => $widget_settings,
+          ),
+          'display' => array(
+            'full' => array(
+              'type' => $field_formatter,
+            ),
+          ),
+        );
+
+        field_create_instance($instance_settings);
+        $field_info['instance_settings'] = $instance_settings;
+        $this->fields[$field['field_name']] = $field_info;
+      }
+    }
+
+    // Determine required permissions.
+    $this->defaultPermissions = array('bypass node access');
+  }
+
+  /**
+   * Submit the add node form with the selected values.
+   * @param $field_name
+   * @param $select
+   * @param $other
+   */
+  protected function setFieldValue($field_name, $select, $other = '') {
+    $edit = array();
+
+    // A node requires a title.
+    $edit["title"] = $this->randomName(8);
+
+    $this->drupalGet('node/add/' . $this->getFieldContentType($field_name));
+
+    // Set the select value.
+    if ($this->fields[$field_name]['cardinality'] == 1) {
+      $edit["{$field_name}[und][select]"] = $select;
+    }
+    else {
+      // We have to treat multiple selection elements differently.
+      $xpath = "//select[@id = :id]";
+      $arguments = array(':id' => "edit-{$field_name}-und-select");
+      $elements = $this->xpath($xpath, $arguments);
+      if (count($elements)) {
+        // We're dealing with a multiple select.
+        $edit["{$field_name}[und][select][]"] = $select;
+      }
+      else {
+        // We're dealing with checkboxes.
+        $edit["{$field_name}[und][select][{$select}]"] = $select;
+      }
+    }
+
+    // Set the other value.
+    $edit["{$field_name}[und][other]"] = $other;
+
+    // Create the node.
+    $this->drupalPost(NULL, $edit, t('Save'));
+  }
+
+  protected function getFieldContentType($field_name) {
+    return $this->fields[$field_name]['content_type']->name;
   }
 
 }

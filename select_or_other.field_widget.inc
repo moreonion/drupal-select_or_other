@@ -287,7 +287,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
 
   // Add values to available options is configured to do so.
   $instance = field_widget_instance($element, $form_state);
-  if ($instance['widget']['settings']['other_unknown_new_option']) {
+  if (isset($instance['widget']['settings']['other_unknown_new_option']) && $instance['widget']['settings']['other_unknown_new_option']) {
     $other_value = _fetch_other_value($element);
     $append = array();
 
