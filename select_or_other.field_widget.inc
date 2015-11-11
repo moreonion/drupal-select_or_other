@@ -244,12 +244,7 @@ function select_or_other_field_widget_validate($element, &$form_state) {
     if (isset($items[0]['value']) && $items[0]['value'] === '') {
       unset($items[0]);
     }
-    if ($element['#multiple'] >= 2 && count($value) > $element['#multiple']) {
-      form_error($element['select'], t('!name: cannot hold more than @count values.', array(
-        '!name' => t($element['select']['#title']),
-        '@count' => $element['#multiple']
-      )));
-    }
+
     $delta = 0;
     $values = array();
     foreach ((array) $value as $v) {
