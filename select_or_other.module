@@ -203,36 +203,6 @@ function select_or_other_element_process($element, &$form_state) {
 }
 
 /**
- * Element validate callback for a Select (or other) element.
- */
-function select_or_other_element_validate($element, &$form_state) {
-  $other_selected = FALSE;
-  if (is_array($element['select']['#value']) && isset($element['select']['#value']['select_or_other'])) {
-    // This is a multiselect. assoc arrays
-    $other_selected = TRUE;
-    $value = $element['select']['#value'];
-    unset($value['select_or_other']);
-    $value[$element['other']['#value']] = $element['other']['#value'];
-  }
-  elseif (is_string($element['select']['#value']) && $element['select']['#value'] == 'select_or_other') {
-    // This is a single select.
-    $other_selected = TRUE;
-    $value = $element['other']['#value'];
-  }
-  else {
-    $value = $element['select']['#value'];
-  }
-  if ($other_selected && !$element['other']['#value']) {
-    form_error($element['other'], t('!title field is required.', array('!title' => $element['select']['#title'])));
-  }
-  if (isset($value)) {
-    form_set_value($element, $value, $form_state);
-    $form_state['clicked_button']['#post'][$element['#name']] = $value; // Is this something we should do?
-  }
-  return $element;
-}
-
-/**
  * Returns HTML for the label for the empty value for options that are not required.
  *
  * The default theme will display N/A for a radio list and '- None -' for a select.
