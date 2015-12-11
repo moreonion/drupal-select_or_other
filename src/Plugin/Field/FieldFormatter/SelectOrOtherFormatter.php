@@ -5,7 +5,7 @@
  * Contains \Drupal\select_or_other\Plugin\Field\FieldFormatter\SelectOrOtherFormatter.
  */
 
-namespace Drupal\email\Plugin\Field\FieldFormatter;
+namespace Drupal\select_or_other\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -17,10 +17,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   id = "select_or_other_formatter",
  *   label = @Translation("Select or other"),
  *   field_types = {
- *     "text",
- *     "number_integer",
- *     "number_decimal",
- *     "number_float"
+ *     "string",
  *   }
  * )
  */
@@ -29,16 +26,16 @@ class SelectOrOtherFormatter extends FormatterBase {
   /**
    * {@inheritdoc}
    */
-  public function viewElements(FieldItemListInterface $items) {
-    $element       = array();
-    $field_options = array();
-    $settings      = $display['settings'];
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $element       = [];
+    $field_options = [];
 
     if ($this->getSetting('available_options')) {
       $field_options = explode("\n", $this->getSetting('available_options'));
       $pos = strpos($this->getSetting('available_options'), '|');
 
       if ($pos !== FALSE) {
+        $temp_options = [];
         // There are keys.
         foreach ($field_options as $field_item) {
           $exploded = explode('|', $field_item);
@@ -57,7 +54,7 @@ class SelectOrOtherFormatter extends FormatterBase {
       }
     }
 
-    return $elements;
+    return $element;
   }
 
 }

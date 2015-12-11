@@ -8,7 +8,7 @@
 namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * Plugin implementation of the 'select_or_other' widget.
@@ -17,10 +17,7 @@ use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
  *   id = "select_or_other",
  *   label = @Translation("Select (or other) list"),
  *   field_types = {
- *     "text",
- *     "number_integer",
- *     "number_decimal",
- *     "number_float",
+ *     "string"
  *   }
  * )
  */
@@ -29,32 +26,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, array &$form_state) {
-    $element = parent::formElement($items, $delta, $element, $form, $form_state);
-
-    $element += array(
-      '#type' => 'select_or_other',
-      '#options' => $this->getOptions($items[$delta]),
-      '#default_value' => $items[$delta]->value,
-      // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->options) > 1,
-      '#maxlength' => $this->getFieldSetting('max_length'),
-      '#other' => $this->getSetting('other'),
-      '#other_title' => $this->getSetting('other_title'),
-      '#other_size' => $this->getSetting('other_size'),
-      '#other_delimiter' => FALSE,
-      '#other_unknown_defaults' => $this->getSetting('other_unknown_defaults'),
-      '#field_widget' => 'select_or_other',
-      '#select_type' => 'select',
-    );
-
-    return $element;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function settingsForm(array $form, array &$form_state) {
+  public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
     $element['available_options'] = array(
@@ -106,6 +78,31 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
     return $element;
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+    $element = parent::formElement($items, $delta, $element, $form, $form_state);
+
+    $element += array(
+      '#type' => 'select_or_other',
+      '#options' => $this->getOptions($items[$delta]),
+      '#default_value' => $items[$delta]->value,
+      // Do not display a 'multiple' select box if there is only one option.
+      '#multiple' => $this->multiple && count($this->options) > 1,
+      '#maxlength' => $this->getFieldSetting('max_length'),
+      '#other' => $this->getSetting('other'),
+      '#other_title' => $this->getSetting('other_title'),
+      '#other_size' => $this->getSetting('other_size'),
+      '#other_delimiter' => FALSE,
+      '#other_unknown_defaults' => $this->getSetting('other_unknown_defaults'),
+      '#field_widget' => 'select_or_other',
+      '#select_type' => 'select',
+    );
+
+    return $element;
+  }
+
    /**
    * {@inheritdoc}
    */
@@ -138,7 +135,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
       if (!$this->required) {
         return static::SELECT_OR_OTHER_EMPTY_NONE;
       }
-      if (!$this->has_value) {
+      if (!$this->hasValue()) {
         return static::SELECT_OR_OTHER_EMPTY_SELECT;
       }
     }
