@@ -15,7 +15,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @FieldWidget(
  *   id = "select_or_other",
- *   label = @Translation("Select (or other) list"),
+ *   label = @Translation("Select or other"),
  *   field_types = {
  *     "string"
  *   }
@@ -27,29 +27,29 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $element = parent::settingsForm($form, $form_state);
+    $form = parent::settingsForm($form, $form_state);
 
-    $element['available_options'] = array(
+    $form['available_options'] = array(
       '#type' => 'textarea',
       '#title' => t('Available options'),
       '#description' => t('A list of values that are, by default, available for selection. Enter one value per line, in the format key|label. The key is the value that will be stored in the database, and the label is what will be displayed to the user.'),
       '#default_value' => $this->getSetting('available_options'),
       '#required' => TRUE,
     );
-    $element['other'] = array(
+    $form['other'] = array(
       '#type' => 'textfield',
       '#title' => t('<em>Other</em> option'),
       '#description' => t('Label for the option that the user will choose when they want to supply an <em>other</em> value.'),
       '#default_value' => $this->getSetting('other'),
       '#required' => TRUE,
     );
-    $element['other_title'] = array(
+    $form['other_title'] = array(
       '#type' => 'textfield',
       '#title' => t('<em>Other</em> field title'),
       '#description' => t('Label for the field in which the user will supply an <em>other</em> value.'),
       '#default_value' => $this->getSetting('other_title'),
     );
-    $element['other_unknown_defaults'] = array(
+    $form['other_unknown_defaults'] = array(
       '#type' => 'select',
       '#title' => t('<em>Other</em> value as default value'),
       '#description' => t("If any incoming default values do not appear in <em>available options</em> (i.e. set as <em>other</em> values), what should happen?"),
@@ -62,20 +62,20 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
       '#default_value' => $this->getSetting('other_unknown_defaults'),
       '#required' => TRUE,
     );
-    $element['other_size'] = array(
+    $form['other_size'] = array(
       '#type' => 'number',
       '#title' => t('<em>Other</em> field size'),
       '#default_value' => $this->getSetting('other_size'),
       '#required' => TRUE,
     );
-    $element['sort_options'] = array(
+    $form['sort_options'] = array(
       '#type' => 'checkbox',
       '#title' => t('Sort options'),
       '#description' => t("Sorts the options in the list alphabetically by value."),
       '#default_value' => $this->getSetting('sort_options'),
     );
 
-    return $element;
+    return $form;
   }
 
   /**
@@ -85,7 +85,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
     $element += array(
-      '#type' => 'select_or_other',
+      '#type' => $this->getSetting('select_element_type'),
       '#options' => $this->getOptions($items[$delta]),
       '#default_value' => $items[$delta]->value,
       // Do not display a 'multiple' select box if there is only one option.

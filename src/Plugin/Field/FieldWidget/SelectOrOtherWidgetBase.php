@@ -78,14 +78,43 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
+      'select_element_type' => 'select_or_other_select',
       'available_options' => '',
       'other' => 'Other',
       'other_title' => '',
       'other_unknown_defaults' => 'other',
       'other_size' => 60,
       'sort_options' => 0,
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $form = parent::settingsForm($form, $form_state);
+
+    $form['select_element_type'] = [
+      '#title' => t('Type of select form element'),
+      '#type' => 'select',
+      '#options' => $this->selectElementTypeOptions(),
+      '#default_value' => $this->getSetting('select_element_type'),
+    ];
+
+    return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    $summary = parent::settingsSummary();
+
+    $options = $this->selectElementTypeOptions();
+    $summary[] = t('Type of select form element') . ': ' . $options[$this->getSetting('select_element_type')];
+
+    return $summary;
   }
 
   /**
@@ -308,6 +337,13 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *   Either static::OPTIONS_EMPTY_NONE, static::OPTIONS_EMPTY_SELECT, or NULL.
    */
   protected function getEmptyOption() {
+  }
+
+  private function selectElementTypeOptions() {
+    return [
+      'select_or_other_select' => t('Select list'),
+      'select_or_other_buttons' => t('Radiobuttons/checkboxes'),
+    ];
   }
 
 }
