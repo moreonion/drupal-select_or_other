@@ -69,7 +69,8 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $property_names = $this->fieldDefinition->getFieldStorageDefinition()->getPropertyNames();
+    $property_names = $this->fieldDefinition->getFieldStorageDefinition()
+      ->getPropertyNames();
     $this->column = $property_names[0];
   }
 
@@ -90,16 +91,20 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-    public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+  public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Prepare some properties for the child methods to build the actual form
     // element.
     $this->required = $element['#required'];
-    $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
+    $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()
+      ->isMultiple();
     $this->has_value = isset($items[0]->{$this->column});
 
 
     // Add our custom validator.
-    $element['#element_validate'][] = array(get_class($this), 'validateElement');
+    $element['#element_validate'][] = array(
+      get_class($this),
+      'validateElement'
+    );
     $element['#key_column'] = $this->column;
 
     // The rest of the $element is built by child method implementations.
@@ -269,7 +274,9 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    */
   protected function flattenOptions(array $array) {
     $result = array();
-    array_walk_recursive($array, function($a, $b) use (&$result) { $result[$b] = $a; });
+    array_walk_recursive($array, function ($a, $b) use (&$result) {
+      $result[$b] = $a;
+    });
     return $result;
   }
 
@@ -300,6 +307,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    * @return string|null
    *   Either static::OPTIONS_EMPTY_NONE, static::OPTIONS_EMPTY_SELECT, or NULL.
    */
-  protected function getEmptyOption() { }
+  protected function getEmptyOption() {
+  }
 
 }

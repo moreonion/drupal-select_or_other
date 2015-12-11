@@ -27,7 +27,7 @@ class SelectOrOtherFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $element       = [];
+    $element = [];
     $field_options = $this->getFieldOptions();
 
     foreach ($items as $delta => $item) {

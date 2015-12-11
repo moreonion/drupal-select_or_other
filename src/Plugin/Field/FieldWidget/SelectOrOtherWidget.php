@@ -103,7 +103,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
     return $element;
   }
 
-   /**
+  /**
    * {@inheritdoc}
    */
   static protected function sanitizeLabel(&$label) {
