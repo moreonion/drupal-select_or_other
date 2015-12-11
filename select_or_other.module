@@ -8,55 +8,6 @@
  * theme which is used by the field widget.
  */
 
-/**
- * Implements hook_theme().
- */
-function select_or_other_theme() {
-  return array(
-    'select_or_other' => array(
-      'render element' => 'element',
-    ),
-    'select_or_other_none' => array(
-      'variables' => array(
-        'instance' => NULL,
-        'option' => NULL,
-      ),
-    ),
-  );
-
-}
-
-/**
- * Theme a Select (or other) element.
- */
-function theme_select_or_other($variables) {
-  $element = $variables['element'];
-
-  $output = "<div class=\"select-or-other\">\n";
-  $output .= drupal_render_children($element) . "\n";
-  $output .= "</div>\n";
-  return $output;
-}
-
-/**
- * Implements hook_element_info().
- */
-function select_or_other_element_info() {
-  return array(
-    'select_or_other' => array(
-      '#select_type' => 'select',
-      '#input' => TRUE,
-      '#multiple' => FALSE,
-      '#disabled' => FALSE,
-      '#default_value' => NULL,
-      '#process' => array('select_or_other_element_process'),
-      '#element_validate' => array('select_or_other_element_validate'),
-      '#other' => t('Other'),
-      '#theme' => 'select_or_other',
-      '#theme_wrappers' => array('form_element'),
-    ),
-  );
-}
 
 /**
  * Implements form_type_hook_value().
@@ -200,62 +151,4 @@ function select_or_other_element_process($element, &$form_state) {
   $element['#title_display'] = 'invisible';
 
   return $element;
-}
-
-/**
- * Returns HTML for the label for the empty value for options that are not required.
- *
- * The default theme will display N/A for a radio list and '- None -' for a select.
- *
- * @param $variables
- *   An associative array containing:
- *   - instance: An array representing the widget requesting the options.
- *   - option: An array representing the widget requesting the options.
- *
- */
-function theme_select_or_other_none($variables) {
-  $instance = $variables['instance'];
-
-  $output = '';
-  switch ($instance['widget']['type']) {
-    case 'select_or_other_buttons':
-      $output = t('N/A');
-      break;
-
-    case 'select_or_other':
-    case 'select_or_other_sort':
-      if (!empty($variables['option']) && $variables['option'] == 'option_none') {
-        $output = t('- None -');
-      }
-      else {
-        $output = t('- Select a value -');
-      }
-      break;
-  }
-
-  return $output;
-}
-
-/**
- * Helper function to check keys in multidimensional array.
- *
- * @param $needle
- *   The key.
- * @param $haystack
- *   The array to check.
- * @return
- *   Boolean indicating if the key is set.
- */
-function select_or_other_multi_array_key_exists($needle, $haystack) {
-  if (array_key_exists(html_entity_decode($needle, ENT_QUOTES), $haystack)) {
-    return TRUE;
-  }
-  else {
-    foreach ($haystack as $key => $value) {
-      if (is_array($value) && select_or_other_multi_array_key_exists($needle, $value)) {
-        return TRUE;
-      }
-    }
-  }
-  return FALSE;
 }
