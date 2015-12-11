@@ -28,6 +28,27 @@ class SelectOrOtherFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $element       = [];
+    $field_options = $this->getFieldOptions();
+
+    foreach ($items as $delta => $item) {
+      if (array_key_exists($item['value'], $field_options)) {
+        $element[$delta] = array('#markup' => $field_options[$item['value']]);
+      }
+      else {
+        $element[$delta] = array('#markup' => $item['value']);
+      }
+    }
+
+    return $element;
+  }
+
+  /**
+   * Retrieves an array of options available for this field.
+   *
+   * @return array
+   *   A Key -> Value array of available options.
+   */
+  protected function getFieldOptions() {
     $field_options = [];
 
     if ($this->getSetting('available_options')) {
@@ -45,16 +66,7 @@ class SelectOrOtherFormatter extends FormatterBase {
       }
     }
 
-    foreach ($items as $delta => $item) {
-      if (array_key_exists($item['value'], $field_options)) {
-        $element[$delta] = array('#markup' => $field_options[$item['value']]);
-      }
-      else {
-        $element[$delta] = array('#markup' => $item['value']);
-      }
-    }
-
-    return $element;
+    return $field_options;
   }
 
 }
