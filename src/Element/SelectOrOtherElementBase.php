@@ -46,8 +46,8 @@ abstract class SelectOrOtherElementBase extends FormElement{
       '#cardinality' => 1,
       '#select_type' => 'list',
       '#merged_values' => FALSE,
-      '#theme_wrappers' => array('form_element'),
-      '#options' => array(),
+      '#theme_wrappers' => ['form_element'],
+      '#options' => [],
       '#tree' => TRUE,
     );
   }
@@ -87,7 +87,7 @@ abstract class SelectOrOtherElementBase extends FormElement{
       if ($element['#cardinality'] !== 1) {
         $values = [
           'select' => (array) $input['select'],
-          'other' => (array) $input['other'],
+          'other' => !empty($input['other']) ? (array) $input['other'] : [],
         ];
 
         if (in_array('select_or_other', $values['select'])) {
@@ -98,7 +98,7 @@ abstract class SelectOrOtherElementBase extends FormElement{
         }
 
         if (isset($element['#merged_values']) && $element['#merged_values']) {
-          if (isset($values['other'])) {
+          if (!empty($values['other'])) {
             $values = array_merge($values['select'], $values['other']);
           }
           else{

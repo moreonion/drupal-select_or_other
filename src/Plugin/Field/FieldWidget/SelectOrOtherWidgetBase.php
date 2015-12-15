@@ -93,7 +93,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $form = parent::settingsForm($form, $form_state);
 
     $form['select_element_type'] = [
-      '#title' => t('Type of select form element'),
+      '#title' => $this->t('Type of select form element'),
       '#type' => 'select',
       '#options' => $this->selectElementTypeOptions(),
       '#default_value' => $this->getSetting('select_element_type'),
@@ -109,7 +109,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $summary = parent::settingsSummary();
 
     $options = $this->selectElementTypeOptions();
-    $summary[] = t('Type of select form element') . ': ' . $options[$this->getSetting('select_element_type')];
+    $summary[] = $this->t('Type of select form element') . ': ' . $options[$this->getSetting('select_element_type')];
 
     return $summary;
   }
@@ -273,8 +273,8 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
   private function selectElementTypeOptions() {
     return [
-      'select_or_other_select' => t('Select list'),
-      'select_or_other_buttons' => t('Radiobuttons/checkboxes'),
+      'select_or_other_select' => $this->t('Select list'),
+      'select_or_other_buttons' => $this->t('Radiobuttons/checkboxes'),
     ];
   }
 
