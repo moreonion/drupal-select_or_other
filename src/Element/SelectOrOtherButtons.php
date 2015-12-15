@@ -26,11 +26,21 @@ class SelectOrOtherButtons extends SelectOrOtherElementBase {
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
     $element = parent::processSelectOrOther($element, $form_state, $complete_form);
 
-    if ($element['#multiple']) {
-      $element['select']['#type'] = 'checkboxes';
+    if ($element['#cardinality'] === 1) {
+      $element['select']['#type'] = 'radios';
+      $element['other']['#states'] = [
+        'visible' => [
+          ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
+        ],
+      ];
     }
     else {
-      $element['select']['#type'] = 'radios';
+      $element['select']['#type'] = 'checkboxes';
+      $element['other']['#states'] = [
+        'visible' => [
+          ':input[name="' . $element['#name'] . '[select][select_or_other]"]' => ['checked' => TRUE],
+        ],
+      ];
     }
 
     return $element;

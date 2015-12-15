@@ -24,7 +24,7 @@ use Drupal\Core\Render\Element\FormElement;
  * - #empty_value: The value of the option that is used to denote no selection.
  *
  */
-abstract class SelectOrOtherElementBase extends FormElement{
+abstract class SelectOrOtherElementBase extends FormElement {
 
   // Adds an 'other' option to the selectbox.
   protected static function addOtherOption($options) {
@@ -61,8 +61,10 @@ abstract class SelectOrOtherElementBase extends FormElement{
     $element['select'] = [
       '#title' => $element['#title'],
       '#title_display' => $element['#title_display'],
+      '#name' => $element['#name'],
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
+      '#cardinality' => $element['#cardinality'],
       '#options' => SelectOrOtherElementBase::addOtherOption($element['#options']),
       '#weight' => 10,
     ];
@@ -93,7 +95,7 @@ abstract class SelectOrOtherElementBase extends FormElement{
         if (in_array('select_or_other', $values['select'])) {
           $values['select'] = array_diff($values['select'], ['select_or_other']);
         }
-        else{
+        else {
           $values['other'] = [];
         }
 
@@ -101,7 +103,7 @@ abstract class SelectOrOtherElementBase extends FormElement{
           if (!empty($values['other'])) {
             $values = array_merge($values['select'], $values['other']);
           }
-          else{
+          else {
             $values = $values['select'];
           }
         }

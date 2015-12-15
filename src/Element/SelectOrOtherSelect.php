@@ -27,6 +27,24 @@ class SelectOrOtherSelect extends SelectOrOtherElementBase {
 
     $element['select']['#type'] = 'select';
 
+    if ($element['#cardinality'] === 1) {
+      $element['other']['#states'] = [
+        'visible' => [
+          ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
+        ],
+      ];
+    }
+    else {
+      $element['select']['#multiple'] = TRUE;
+
+      // todo Drupal #states does not support multiple select elements. We have
+      // to simulate #states using our own javascript until #1149078 is
+      // resolved. @see https://www.drupal.org/node/1149078
+      $element['select']['#attached'] = [
+        'library' => ['select_or_other/multiple_select_states_hack']
+      ];
+    }
+
     return $element;
   }
 

@@ -99,8 +99,10 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $original_element = $element = [
       '#title' => 'Title',
       '#title_display' => 'above',
+      '#name' => 'select_or_other',
       '#default_value' => 'default',
       '#required' => TRUE,
+      '#cardinality' => 1,
       '#options' => [
         'first_option' => 'First option',
         'second_option' => "Second option"
@@ -111,8 +113,10 @@ class SelectOrOtherElementsTest extends UnitTestCase {
         'select' => [
           '#title' => $element['#title'],
           '#title_display' => $element['#title_display'],
+          '#name' => $element['#name'],
           '#default_value' => $element['#default_value'],
           '#required' => $element['#required'],
+          '#cardinality' => $element['#cardinality'],
           '#options' => $method->invoke(NULL, $element['#options']),
           '#weight' => 10,
         ],
@@ -127,22 +131,69 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $this->assertArrayEquals($expected_element, $resulting_element);
     $this->assertArrayEquals($resulting_element, $element);
 
-    // Test SelectOrOtherButtons.
-    $element = $original_element + ['#multiple' => TRUE];
-    $expected_element = array_merge_recursive($base_expected_element, ['#multiple' => TRUE, 'select' => ['#type' => 'checkboxes']]);
-    $resulting_element = SelectOrOtherButtons::processSelectOrOther($element, $form_state, $form);
-    $this->assertArrayEquals($expected_element, $resulting_element);
-    $this->assertArrayEquals($resulting_element, $element);
-
-    $element = $original_element + ['#multiple' => FALSE];
-    $expected_element = array_merge_recursive($base_expected_element, ['#multiple' => FALSE, 'select' => ['#type' => 'radios']]);
-    $resulting_element = SelectOrOtherButtons::processSelectOrOther($element, $form_state, $form);
-    $this->assertArrayEquals($expected_element, $resulting_element);
-    $this->assertArrayEquals($resulting_element, $element);
-
-    // Test SelectOrOtherSelect
+    // Test single cardinality SelectOrOtherButtons.
     $element = $original_element;
-    $expected_element = array_merge_recursive($base_expected_element, ['select' => ['#type' => 'select']]);
+    $expected_element = array_merge_recursive($base_expected_element, [
+      'select' => [
+        '#type' => 'checkboxes',
+      ],
+      'other' => [
+        '#states' => [
+          'visible' => [
+            ':input[name="' . $element['#name'] . '[select][select_or_other]"]' => ['checked' => TRUE],
+          ],
+        ],
+      ],
+    ]);
+    $element['#cardinality'] = $expected_element['#cardinality'] = $expected_element['select']['#cardinality'] = 10;
+    $resulting_element = SelectOrOtherButtons::processSelectOrOther($element, $form_state, $form);
+    $this->assertArrayEquals($expected_element, $resulting_element);
+    $this->assertArrayEquals($resulting_element, $element);
+
+    // Test multiple cardinality SelectOrOtherButtons.
+    $element = $original_element;
+    $expected_element = array_merge_recursive($base_expected_element, [
+      'select' => ['#type' => 'radios'],
+      'other' => [
+        '#states' => [
+          'visible' => [
+            ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
+          ],
+        ],
+      ],
+    ]);
+    $resulting_element = SelectOrOtherButtons::processSelectOrOther($element, $form_state, $form);
+    $this->assertArrayEquals($expected_element, $resulting_element);
+    $this->assertArrayEquals($resulting_element, $element);
+
+    // Test single cardinality SelectOrOtherSelect
+    $element = $original_element;
+    $expected_element = array_merge_recursive($base_expected_element, [
+      'select' => ['#type' => 'select'],
+      'other' => [
+        '#states' => [
+          'visible' => [
+            ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
+          ],
+        ],
+      ],
+    ]);
+    $resulting_element = SelectOrOtherSelect::processSelectOrOther($element, $form_state, $form);
+    $this->assertArrayEquals($expected_element, $resulting_element);
+    $this->assertArrayEquals($resulting_element, $element);
+
+    // Test single cardinality SelectOrOtherSelect
+    $element = $original_element;
+    $expected_element = array_merge_recursive($base_expected_element, [
+      'select' => [
+        '#type' => 'select',
+        '#multiple' => TRUE,
+        '#attached' => [
+          'library' => ['select_or_other/multiple_select_states_hack']
+        ],
+      ],
+    ]);
+    $element['#cardinality'] = $expected_element['#cardinality'] = $expected_element['select']['#cardinality'] = 10;
     $resulting_element = SelectOrOtherSelect::processSelectOrOther($element, $form_state, $form);
     $this->assertArrayEquals($expected_element, $resulting_element);
     $this->assertArrayEquals($resulting_element, $element);
