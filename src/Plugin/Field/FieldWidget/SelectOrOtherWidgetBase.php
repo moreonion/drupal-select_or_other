@@ -126,13 +126,15 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
       ->isMultiple();
     $this->has_value = isset($items[0]->{$this->getColumn()});
 
-
-    // Add our custom validator.
-    $element['#element_validate'][] = array(
-      get_class($this),
-      'validateElement'
-    );
-    $element['#key_column'] = $this->getColumn();
+    $element += [
+      '#type' => $this->getSetting('select_element_type'),
+      '#options' => $this->getOptions(),
+      '#default_value' => $items[$delta]->value,
+      // Do not display a 'multiple' select box if there is only one option.
+      '#multiple' => $this->multiple && count($this->options) > 1,
+      '#key_column' => $this->getColumn(),
+      '#element_validate' => [[get_class($this), 'validateElement']],
+    ];
 
     // The rest of the $element is built by child method implementations.
 

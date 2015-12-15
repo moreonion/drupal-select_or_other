@@ -85,11 +85,6 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
     $element += array(
-      '#type' => $this->getSetting('select_element_type'),
-      '#options' => $this->getOptions($items[$delta]),
-      '#default_value' => $items[$delta]->value,
-      // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->options) > 1,
       '#maxlength' => $this->getFieldSetting('max_length'),
       '#other' => $this->getSetting('other'),
       '#other_title' => $this->getSetting('other_title'),
