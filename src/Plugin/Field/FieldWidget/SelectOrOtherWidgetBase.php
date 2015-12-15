@@ -9,7 +9,6 @@ namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -194,90 +193,23 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   /**
    * Returns the array of options for the widget.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
-   *   The field item.
-   *
    * @return array
-   *   The array of options for the widget.
+   *   The array of available options for the widget.
    */
-  protected function getOptions(FieldItemInterface $item) {
-    if (!isset($this->options)) {
-      $string_options = $this->getSetting('available_options');
-
-      $string_options = trim($string_options);
-      if (empty($string_options)) {
-        return [];
-      }
-      // If option has a key specified
-      if (strpos($string_options, '|') !== FALSE) {
-        $options = [];
-        $list = explode("\n", $string_options);
-        $list = array_map('trim', $list);
-        $list = array_filter($list, 'strlen');
-
-        foreach ($list as $position => $text) {
-          $value = $key = FALSE;
-
-          // Check for an explicit key.
-          $matches = array();
-          if (preg_match('/(.*)\|(.*)/', $text, $matches)) {
-            $key = $matches[1];
-            $value = $matches[2];
-          }
-
-          $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
-        }
-      }
-      else {
-        $options[$string_options] = html_entity_decode($string_options);
-      }
-
-
-      $label = t('N/A');
-
-      // Add an empty option if the widget needs one.
-      if ($empty_option = $this->getEmptyOption()) {
-        switch ($this->getPluginId()) {
-          case 'select_or_other_buttons':
-            $label = t('N/A');
-            break;
-
-          case 'select_or_other':
-          case 'select_or_other_sort':
-            $label = ($empty_option == static::SELECT_OR_OTHER_EMPTY_NONE ? t('- None -') : t('- Select a value -'));
-            break;
-        }
-
-        $options = array('_none' => $label) + $options;
-      }
-
-      array_walk_recursive($options, array($this, 'sanitizeLabel'));
-
-      // Options might be nested ("optgroups"). If the widget does not support
-      // nested options, flatten the list.
-      if (!$this->supportsGroups()) {
-        $options = $this->flattenOptions($options);
-      }
-
-      $this->options = $options;
-    }
-    return $this->options;
-  }
+  abstract protected function getOptions();
 
   /**
    * Determines selected options from the incoming field values.
    *
    * @param \Drupal\Core\Field\FieldItemListInterface $items
    *   The field values.
-   * @param int $delta
-   *   (optional) The delta of the item to get options for. Defaults to 0.
    *
    * @return array
    *   The array of corresponding selected options.
    */
-  protected function getSelectedOptions(FieldItemListInterface $items, $delta = 0) {
+  protected function getSelectedOptions(FieldItemListInterface $items) {
     // We need to check against a flat list of options.
-    $flat_options = $this->flattenOptions($this->getOptions($items[$delta]));
+    $flat_options = $this->flattenOptions($this->getOptions());
 
     $selected_options = array();
     foreach ($items as $item) {

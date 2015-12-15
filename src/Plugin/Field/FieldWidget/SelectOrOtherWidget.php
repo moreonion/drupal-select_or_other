@@ -101,6 +101,73 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
   /**
    * {@inheritdoc}
    */
+  protected function getOptions() {
+    if (!isset($this->options)) {
+      $string_options = $this->getSetting('available_options');
+
+      $string_options = trim($string_options);
+      if (empty($string_options)) {
+        return [];
+      }
+      // If option has a key specified
+      if (strpos($string_options, '|') !== FALSE) {
+        $options = [];
+        $list = explode("\n", $string_options);
+        $list = array_map('trim', $list);
+        $list = array_filter($list, 'strlen');
+
+        foreach ($list as $position => $text) {
+          $value = $key = FALSE;
+
+          // Check for an explicit key.
+          $matches = array();
+          if (preg_match('/(.*)\|(.*)/', $text, $matches)) {
+            $key = $matches[1];
+            $value = $matches[2];
+          }
+
+          $options[$key] = (isset($value) && $value !== '') ? html_entity_decode($value) : $key;
+        }
+      }
+      else {
+        $options[$string_options] = html_entity_decode($string_options);
+      }
+
+
+      $label = t('N/A');
+
+      // Add an empty option if the widget needs one.
+      if ($empty_option = $this->getEmptyOption()) {
+        switch ($this->getPluginId()) {
+          case 'select_or_other_buttons':
+            $label = t('N/A');
+            break;
+
+          case 'select_or_other':
+          case 'select_or_other_sort':
+            $label = ($empty_option == static::SELECT_OR_OTHER_EMPTY_NONE ? t('- None -') : t('- Select a value -'));
+            break;
+        }
+
+        $options = array('_none' => $label) + $options;
+      }
+
+      array_walk_recursive($options, array($this, 'sanitizeLabel'));
+
+      // Options might be nested ("optgroups"). If the widget does not support
+      // nested options, flatten the list.
+      if (!$this->supportsGroups()) {
+        $options = $this->flattenOptions($options);
+      }
+
+      $this->options = $options;
+    }
+    return $this->options;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   static protected function sanitizeLabel(&$label) {
     // Select form inputs allow unencoded HTML entities, but no HTML tags.
     $label = strip_tags($label);
@@ -134,6 +201,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
         return static::SELECT_OR_OTHER_EMPTY_SELECT;
       }
     }
+    return NULL;
   }
 
 }
