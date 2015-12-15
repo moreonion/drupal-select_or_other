@@ -8,7 +8,6 @@
 namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Xss;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\WidgetBase;
@@ -37,14 +36,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   const SELECT_OR_OTHER_EMPTY_SELECT = 'options_select';
 
   /**
-   * Abstract over the actual field columns, to allow different field types to
-   * reuse those widgets.
-   *
-   * @var string
-   */
-  protected $column;
-
-  /**
    * @var string
    */
   protected $multiple;
@@ -65,13 +56,20 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   private $has_value;
 
   /**
-   * {@inheritdoc}
+   * Helper method to determine the identifying column for the field.
+   *
+   * @return string
+   *   The name of the column.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-    $property_names = $this->fieldDefinition->getFieldStorageDefinition()
-      ->getPropertyNames();
-    $this->column = $property_names[0];
+  protected function getColumn() {
+    static $property_names;
+
+    if (empty($property_names)) {
+      $property_names = $this->fieldDefinition->getFieldStorageDefinition()
+        ->getPropertyNames();
+    }
+
+    return reset($property_names);
   }
 
   /**
@@ -126,7 +124,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $this->required = $element['#required'];
     $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()
       ->isMultiple();
-    $this->has_value = isset($items[0]->{$this->column});
+    $this->has_value = isset($items[0]->{$this->getColumn()});
 
 
     // Add our custom validator.
@@ -134,7 +132,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
       get_class($this),
       'validateElement'
     );
-    $element['#key_column'] = $this->column;
+    $element['#key_column'] = $this->getColumn();
 
     // The rest of the $element is built by child method implementations.
 
@@ -281,7 +279,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
     $selected_options = array();
     foreach ($items as $item) {
-      $value = $item->{$this->column};
+      $value = $item->{$this->getColumn()};
       // Keep the value if it actually is in the list of options (needs to be
       // checked against the flat list).
       if (isset($flat_options[$value])) {
