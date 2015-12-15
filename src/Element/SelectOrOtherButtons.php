@@ -28,19 +28,11 @@ class SelectOrOtherButtons extends SelectOrOtherElementBase {
 
     if ($element['#cardinality'] === 1) {
       $element['select']['#type'] = 'radios';
-      $element['other']['#states'] = [
-        'visible' => [
-          ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
-        ],
-      ];
+      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }
     else {
       $element['select']['#type'] = 'checkboxes';
-      $element['other']['#states'] = [
-        'visible' => [
-          ':input[name="' . $element['#name'] . '[select][select_or_other]"]' => ['checked' => TRUE],
-        ],
-      ];
+      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select][select_or_other]', 'checked', TRUE);
     }
 
     return $element;

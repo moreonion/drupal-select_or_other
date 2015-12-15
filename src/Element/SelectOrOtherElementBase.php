@@ -26,11 +26,29 @@ use Drupal\Core\Render\Element\FormElement;
  */
 abstract class SelectOrOtherElementBase extends FormElement {
 
-  // Adds an 'other' option to the selectbox.
+  /**
+   * Adds an 'other' option to the selectbox.
+   */
   protected static function addOtherOption($options) {
     $options['select_or_other'] = 'Other';
 
     return $options;
+  }
+
+  /**
+   * Prepares a form API #states array.
+   * @param $state
+   * @param $elementName
+   * @param $valueKey
+   * @param $value
+   * @return array
+   */
+  protected static function prepareStates($state, $elementName, $valueKey, $value) {
+    return [
+      $state => [
+        ':input[name="' . $elementName . '"]' => [$valueKey => $value],
+      ],
+    ];
   }
 
   /**
