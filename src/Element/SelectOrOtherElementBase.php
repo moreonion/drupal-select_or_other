@@ -89,7 +89,6 @@ abstract class SelectOrOtherElementBase extends FormElement {
     $element['other'] = [
       '#type' => 'textfield',
       '#weight' => 20,
-      '#default_value' => 'default',
     ];
 
     return $element;

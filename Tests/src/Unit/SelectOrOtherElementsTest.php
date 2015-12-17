@@ -126,7 +126,6 @@ class SelectOrOtherElementsTest extends UnitTestCase {
         'other' => [
           '#type' => 'textfield',
           '#weight' => 20,
-          '#default_value' => 'default',
         ]
       ];
 
