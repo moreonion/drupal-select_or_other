@@ -97,8 +97,6 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $form_state = new FormState();
     $form = [];
     $original_element = $element = [
-      '#title' => 'Title',
-      '#title_display' => 'above',
       '#name' => 'select_or_other',
       '#default_value' => 'default',
       '#required' => TRUE,
@@ -111,8 +109,6 @@ class SelectOrOtherElementsTest extends UnitTestCase {
 
     $base_expected_element = $expected_element = $element + [
         'select' => [
-          '#title' => $element['#title'],
-          '#title_display' => $element['#title_display'],
           '#name' => $element['#name'],
           '#default_value' => $element['#default_value'],
           '#required' => $element['#required'],
@@ -173,7 +169,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
       'other' => [
         '#states' => [
           'visible' => [
-            ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
+            ':input[name="' . $element['#name'] . '"]' => ['value' => 'select_or_other'],
           ],
         ],
       ],

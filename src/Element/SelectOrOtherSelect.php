@@ -28,7 +28,7 @@ class SelectOrOtherSelect extends SelectOrOtherElementBase {
     $element['select']['#type'] = 'select';
 
     if ($element['#cardinality'] === 1) {
-      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
+      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'], 'value', 'select_or_other');
     }
     else {
       $element['select']['#multiple'] = TRUE;

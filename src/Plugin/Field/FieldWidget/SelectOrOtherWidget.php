@@ -18,7 +18,8 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = @Translation("Select or other"),
  *   field_types = {
  *     "string"
- *   }
+ *   },
+ *   multiple_values = TRUE
  * )
  */
 class SelectOrOtherWidget extends SelectOrOtherWidgetBase {

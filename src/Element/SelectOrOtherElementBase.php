@@ -77,8 +77,6 @@ abstract class SelectOrOtherElementBase extends FormElement {
    */
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
     $element['select'] = [
-      '#title' => $element['#title'],
-      '#title_display' => $element['#title_display'],
       '#name' => $element['#name'],
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
