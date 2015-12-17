@@ -196,16 +196,4 @@ class SelectOrOtherElementsTest extends UnitTestCase {
 
   }
 
-  /**
-   * Tests the getInfo() method.
-   *
-   * Since this returns a hardcoded array, we'll just test if it actually does
-   * return an array to get 100% coverage for this class.
-   */
-  public function testGetInfo() {
-    /** @var SelectOrOtherElementBase $stub */
-    $stub = $this->getMockForAbstractClass('Drupal\select_or_other\Element\SelectOrOtherElementBase', [], '', FALSE);
-    $this->assertTrue(is_array($stub->getInfo()));
-  }
-
 }

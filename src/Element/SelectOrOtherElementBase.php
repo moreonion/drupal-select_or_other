@@ -53,6 +53,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
 
   /**
    * {@inheritdoc}
+   * @codeCoverageIgnore
    */
   public function getInfo() {
     $class = get_class($this);
