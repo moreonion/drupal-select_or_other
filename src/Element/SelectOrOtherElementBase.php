@@ -100,7 +100,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
    */
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     $values = [];
-    if ($input !== FALSE) {
+    if ($input !== FALSE && !empty($input['select'])) {
 
       if ($element['#cardinality'] !== 1) {
         $values = [

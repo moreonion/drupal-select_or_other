@@ -83,6 +83,14 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
     $this->assertArrayEquals($expected, $values, 'Returned merged array.');
 
+    foreach ([1,20] as $cardinality) {
+      $element['#cardinality'] = $cardinality;
+      $input = ['other' => 'Other value'];
+      $expected = [];
+      $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
+      $this->assertArrayEquals($expected, $values, 'Submitting only the other value results in an empty array.');
+    }
+
   }
 
   /**
