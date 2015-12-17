@@ -109,7 +109,6 @@ class SelectOrOtherElementsTest extends UnitTestCase {
 
     $base_expected_element = $expected_element = $element + [
         'select' => [
-          '#name' => $element['#name'],
           '#default_value' => $element['#default_value'],
           '#required' => $element['#required'],
           '#cardinality' => $element['#cardinality'],
@@ -169,7 +168,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
       'other' => [
         '#states' => [
           'visible' => [
-            ':input[name="' . $element['#name'] . '"]' => ['value' => 'select_or_other'],
+            ':input[name="' . $element['#name'] . '[select]"]' => ['value' => 'select_or_other'],
           ],
         ],
       ],
