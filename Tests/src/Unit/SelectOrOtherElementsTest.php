@@ -39,7 +39,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
   public function testValueCallback() {
     $form_state = new FormState();
     $element = [
-      '#cardinality' => 1,
+      '#multiple' => FALSE,
     ];
     $input = [
       'select' => 'Selected text',
@@ -55,7 +55,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
     $this->assertArrayEquals($expected, $values, 'Returned single value other.');
 
-    $element['#cardinality'] = -1;
+    $element['#multiple'] = TRUE;
     $input['select'] = ['Selected text'];
     $expected = ['select' => $input['select'], 'other' => []];
     $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
@@ -83,8 +83,8 @@ class SelectOrOtherElementsTest extends UnitTestCase {
     $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
     $this->assertArrayEquals($expected, $values, 'Returned merged array.');
 
-    foreach ([1,20] as $cardinality) {
-      $element['#cardinality'] = $cardinality;
+    foreach ([TRUE, FALSE] as $multiple) {
+      $element['#multiple'] = $multiple;
       $input = ['other' => 'Other value'];
       $expected = [];
       $values = SelectOrOtherElementBase::valueCallback($element, $input, $form_state);
@@ -108,7 +108,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
       '#name' => 'select_or_other',
       '#default_value' => 'default',
       '#required' => TRUE,
-      '#cardinality' => 1,
+      '#multiple' => FALSE,
       '#options' => [
         'first_option' => 'First option',
         'second_option' => "Second option"
@@ -119,7 +119,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
         'select' => [
           '#default_value' => $element['#default_value'],
           '#required' => $element['#required'],
-          '#cardinality' => $element['#cardinality'],
+          '#multiple' => $element['#multiple'],
           '#options' => $method->invoke(NULL, $element['#options']),
           '#weight' => 10,
         ],
@@ -147,7 +147,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
         ],
       ],
     ]);
-    $element['#cardinality'] = $expected_element['#cardinality'] = $expected_element['select']['#cardinality'] = 10;
+    $element['#multiple'] = $expected_element['#multiple'] = $expected_element['select']['#multiple'] = TRUE;
     $resulting_element = SelectOrOtherButtons::processSelectOrOther($element, $form_state, $form);
     $this->assertArrayEquals($expected_element, $resulting_element);
     $this->assertArrayEquals($resulting_element, $element);
@@ -195,7 +195,7 @@ class SelectOrOtherElementsTest extends UnitTestCase {
         ],
       ],
     ]);
-    $element['#cardinality'] = $expected_element['#cardinality'] = $expected_element['select']['#cardinality'] = 10;
+    $element['#multiple'] = $expected_element['#multiple'] = $expected_element['select']['#multiple'] = TRUE;
     $resulting_element = SelectOrOtherSelect::processSelectOrOther($element, $form_state, $form);
     $this->assertArrayEquals($expected_element, $resulting_element);
     $this->assertArrayEquals($resulting_element, $element);

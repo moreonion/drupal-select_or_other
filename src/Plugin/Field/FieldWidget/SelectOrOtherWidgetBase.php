@@ -130,7 +130,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
       '#options' => $this->getOptions(),
       '#default_value' => $this->getSelectedOptions($items),
       // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->options) > 1,
+      '#multiple' => $this->multiple && count($this->getOptions()) > 1,
       '#key_column' => $this->getColumn(),
       '#element_validate' => [[get_class($this), 'validateElement']],
     ];

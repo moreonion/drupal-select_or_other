@@ -26,7 +26,7 @@ class SelectOrOtherButtons extends SelectOrOtherElementBase {
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
     $element = parent::processSelectOrOther($element, $form_state, $complete_form);
 
-    if ($element['#cardinality'] === 1) {
+    if (!$element['#multiple']) {
       $element['select']['#type'] = 'radios';
       $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }

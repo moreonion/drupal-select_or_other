@@ -13,7 +13,7 @@ use Drupal\Core\Render\Element\FormElement;
  * Base class for select or other form elements.
  *
  * Properties:
- * - #cardinality: The maximum number of options that can be selected.
+ * - #multiple: If the widget should allow multiple values to be selected.
  * - #select_type: Either 'list' for a select list and 'buttons' for checkboxes
  *   or radio buttons depending on cardinality.
  * - #merged_values: Set this to true if the widget should return a single array
@@ -62,7 +62,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
       '#process' => [
         [$class, 'processSelectOrOther'],
       ],
-      '#cardinality' => 1,
+      '#multiple' => FALSE,
       '#select_type' => 'list',
       '#merged_values' => FALSE,
       '#theme_wrappers' => ['form_element'],
@@ -80,7 +80,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
     $element['select'] = [
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
-      '#cardinality' => $element['#cardinality'],
+      '#multiple' => $element['#multiple'],
       '#options' => SelectOrOtherElementBase::addOtherOption($element['#options']),
       '#weight' => 10,
     ];
@@ -101,7 +101,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
     $values = [];
     if ($input !== FALSE && !empty($input['select'])) {
 
-      if ($element['#cardinality'] !== 1) {
+      if ($element['#multiple']) {
         $values = [
           'select' => (array) $input['select'],
           'other' => !empty($input['other']) ? (array) $input['other'] : [],
