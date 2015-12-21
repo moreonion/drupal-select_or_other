@@ -1,13 +1,12 @@
 <?php
 
-namespace Drupal\Tests\select_or_other\Unit;
+namespace Drupal\tests\select_or_other\Unit;
 
 use Drupal\Core\Form\FormState;
 use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use ReflectionMethod;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Tests the form element implementation.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\select_or_other\Unit;
+namespace Drupal\tests\select_or_other\Unit;
 
 use Drupal\Core\Form\FormState;
 use Drupal\select_or_other\Element\SelectOrOtherButtons;
