@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\select_or_other\Element\SelectOrOtherButtons.
+ * Contains Drupal\select_or_other\Element\Buttons.
  */
 
 namespace Drupal\select_or_other\Element;
@@ -14,11 +14,11 @@ use Drupal\Core\Form\FormStateInterface;
  * Provides a form element with buttons and other option.
  *
  * Properties:
- * @see SelectOrOtherElementBase
+ * @see ElementBase
  *
  * @FormElement("select_or_other_buttons")
  */
-class SelectOrOtherButtons extends SelectOrOtherElementBase {
+class Buttons extends ElementBase {
 
   /**
    * {@inheritdoc}
@@ -28,11 +28,11 @@ class SelectOrOtherButtons extends SelectOrOtherElementBase {
 
     if (!$element['#multiple']) {
       $element['select']['#type'] = 'radios';
-      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
+      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }
     else {
       $element['select']['#type'] = 'checkboxes';
-      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select][select_or_other]', 'checked', TRUE);
+      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select][select_or_other]', 'checked', TRUE);
     }
 
     return $element;

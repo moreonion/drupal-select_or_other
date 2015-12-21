@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\select_or_other\Element\SelectOrOtherSelect.
+ * Contains Drupal\select_or_other\Element\Select.
  */
 
 namespace Drupal\select_or_other\Element;
@@ -13,11 +13,11 @@ use Drupal\Core\Form\FormStateInterface;
  *  * Provides a form element with a select box and other option.
  *
  * Properties:
- * @see SelectOrOtherElementBase
+ * @see ElementBase
  *
  * @FormElement("select_or_other_select")
  */
-class SelectOrOtherSelect extends SelectOrOtherElementBase {
+class Select extends ElementBase {
 
   /**
    * {@inheritdoc}
@@ -28,7 +28,7 @@ class SelectOrOtherSelect extends SelectOrOtherElementBase {
     $element['select']['#type'] = 'select';
 
     if (!$element['#multiple']) {
-      $element['other']['#states'] = SelectOrOtherElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
+      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }
     else {
       $element['select']['#multiple'] = TRUE;

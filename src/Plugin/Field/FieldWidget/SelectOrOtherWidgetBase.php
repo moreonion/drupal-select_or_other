@@ -37,21 +37,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   /**
    * @var string
    */
-  protected $multiple;
-
-  /**
-   * @var string
-   */
-  protected $required;
-
-  /**
-   * @var string
-   */
-  protected $options;
-
-  /**
-   * @var string
-   */
   private $has_value;
 
   /**
@@ -69,6 +54,23 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     }
 
     return reset($property_names);
+  }
+
+  /**
+   * Helper method to determine if the field supports multiple values.
+   *
+   * @return bool
+   */
+  protected function isMultiple() {
+    return $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
+  }
+
+  /**
+   * Helper method to determine if the field is required.
+   * @return bool
+   */
+  protected function isRequired() {
+    return $this->fieldDefinition->isRequired();
   }
 
   /**
@@ -120,9 +122,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Prepare some properties for the child methods to build the actual form
     // element.
-    $this->required = $element['#required'];
-    $this->multiple = $this->fieldDefinition->getFieldStorageDefinition()
-      ->isMultiple();
     $this->has_value = isset($items[0]->{$this->getColumn()});
 
     $element += [
@@ -130,7 +129,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
       '#options' => $this->getOptions(),
       '#default_value' => $this->getSelectedOptions($items),
       // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->multiple && count($this->getOptions()) > 1,
+      '#multiple' => $this->isMultiple() && count($this->getOptions()) > 1,
       '#key_column' => $this->getColumn(),
       '#element_validate' => [[get_class($this), 'validateElement']],
     ];
@@ -208,16 +207,23 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *   The array of corresponding selected options.
    */
   protected function getSelectedOptions(FieldItemListInterface $items) {
-    // We need to check against a flat list of options.
-    $flat_options = $this->flattenOptions($this->getOptions());
+    $selected_options = [];
 
-    $selected_options = array();
     foreach ($items as $item) {
-      $value = $item->{$this->getColumn()};
-      // Keep the value if it actually is in the list of options (needs to be
-      // checked against the flat list).
-      if (isset($flat_options[$value])) {
-        $selected_options[] = $value;
+      $selected_options[] = $item->{$this->getColumn()};
+    }
+
+    $selected_options = $this->prepareSelectedOptions($selected_options);
+
+    if ($selected_options) {
+      // We need to check against a flat list of options.
+      $flattened_options = $this->flattenOptions($this->getOptions());
+
+      foreach ($selected_options as $key => $selected_option) {
+        // Remove the option if it does not exist in the options.
+        if (!isset($flattened_options[$selected_option])) {
+          unset($selected_options[$key]);
+        }
       }
     }
 
@@ -271,6 +277,33 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   protected function getEmptyOption() {
   }
 
+  /**
+   * Prepares selected options for comparison to the available options.
+   *
+   * Sometimes widgets have to change the keys of their available options. This
+   * method allows those widgets to do the same with the selected options to
+   * ensure they actually end up selected in the widget.
+   *
+   * @param array $options
+   *   The options to prepare.
+   *
+   * @return array
+   *   The prepared option.
+   */
+  protected function prepareSelectedOptions(array $options) {
+    return $options;
+  }
+
+  /**
+   * Returns the types of select elements available for selection.
+   *
+   * @return array
+   *   The available select element types.
+   *
+   * @codeCoverageIgnore
+   *   Testing this method would only test if this hard-coded array equals the
+   *   one in the test case.
+   */
   private function selectElementTypeOptions() {
     return [
       'select_or_other_select' => $this->t('Select list'),

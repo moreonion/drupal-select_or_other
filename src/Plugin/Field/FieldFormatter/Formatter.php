@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\select_or_other\Plugin\Field\FieldFormatter\SelectOrOtherFormatter.
+ * Contains \Drupal\select_or_other\Plugin\Field\FieldFormatter\Formatter.
  */
 
 namespace Drupal\select_or_other\Plugin\Field\FieldFormatter;
@@ -21,7 +21,7 @@ use Drupal\Core\Field\FieldItemListInterface;
  *   }
  * )
  */
-class SelectOrOtherFormatter extends FormatterBase {
+class Formatter extends FormatterBase {
 
   /**
    * {@inheritdoc}

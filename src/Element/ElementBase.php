@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\select_or_other\Element\SelectOrOtherElementBase.
+ * Contains Drupal\select_or_other\Element\ElementBase.
  */
 
 namespace Drupal\select_or_other\Element;
@@ -24,7 +24,7 @@ use Drupal\Core\Render\Element\FormElement;
  * - #empty_value: The value of the option that is used to denote no selection.
  *
  */
-abstract class SelectOrOtherElementBase extends FormElement {
+abstract class ElementBase extends FormElement {
 
   /**
    * Adds an 'other' option to the selectbox.
@@ -81,7 +81,7 @@ abstract class SelectOrOtherElementBase extends FormElement {
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
       '#multiple' => $element['#multiple'],
-      '#options' => SelectOrOtherElementBase::addOtherOption($element['#options']),
+      '#options' => ElementBase::addOtherOption($element['#options']),
       '#weight' => 10,
     ];
 
@@ -117,6 +117,9 @@ abstract class SelectOrOtherElementBase extends FormElement {
         if (isset($element['#merged_values']) && $element['#merged_values']) {
           if (!empty($values['other'])) {
             $values = array_merge($values['select'], $values['other']);
+            // Add the other option to the available options to prevent
+            // validation errors.
+            $element['#options'][$input['other']] = $input['other'];
           }
           else {
             $values = $values['select'];
@@ -127,6 +130,9 @@ abstract class SelectOrOtherElementBase extends FormElement {
       else {
         if ($input['select'] === 'select_or_other') {
           $values = [$input['other']];
+          // Add the other option to the available options to prevent
+          // validation errors.
+          $element['#options'][$input['other']] = $input['other'];
         }
         else {
           $values = [$input['select']];

@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidget.
+ * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\Widget.
  */
 
 namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
@@ -22,7 +22,12 @@ use Drupal\Core\Form\FormStateInterface;
  *   multiple_values = TRUE
  * )
  */
-class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
+class Widget extends SelectOrOtherWidgetBase {
+
+  /**
+   * @var string
+   */
+  protected $options;
 
   /**
    * {@inheritdoc}
@@ -185,9 +190,9 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
    * {@inheritdoc}
    */
   protected function getEmptyOption() {
-    if ($this->multiple) {
+    if ($this->isMultiple()) {
       // Multiple select: add a 'none' option for non-required fields.
-      if (!$this->required) {
+      if (!$this->isRequired()) {
         return static::SELECT_OR_OTHER_EMPTY_NONE;
       }
     }
@@ -195,7 +200,7 @@ class SelectOrOtherWidget extends SelectOrOtherWidgetBase {
       // Single select: add a 'none' option for non-required fields,
       // and a 'select a value' option for required fields that do not come
       // with a value selected.
-      if (!$this->required) {
+      if (!$this->isRequired()) {
         return static::SELECT_OR_OTHER_EMPTY_NONE;
       }
       if (!$this->hasValue()) {
