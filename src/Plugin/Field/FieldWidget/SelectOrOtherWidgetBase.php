@@ -256,17 +256,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   }
 
   /**
-   * Sanitizes a string label to display as an option.
-   *
-   * @param string $label
-   *   The label to sanitize.
-   */
-  static protected function sanitizeLabel(&$label) {
-    // Allow a limited set of HTML tags.
-    $label = Xss::filter($label);
-  }
-
-  /**
    * Returns the empty option to add to the list of options, if any.
    *
    * @return string|null
