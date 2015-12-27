@@ -16,7 +16,7 @@ use ReflectionMethod;
  */
 class SelectOrOtherWidgetBaseTest extends UnitTestCase {
 
-  protected static $testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase';
+  protected $testedClassName;
 
   /**
    * @var PHPUnit_Framework_MockObject_MockObject $stub
@@ -35,6 +35,7 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
 
   protected function setUp() {
     parent::setUp();
+    $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase';
     $container_class = 'Drupal\Core\DependencyInjection\Container';
     $methods = get_class_methods($container_class);
     $this->containerMock = $this->getMockBuilder($container_class)
@@ -52,7 +53,7 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
       [],
     ];
 
-    $this->widgetBaseMock = $this->getMockForAbstractClass($this::$testedClassName, $arguments);
+    $this->widgetBaseMock = $this->getMockForAbstractClass($this->testedClassName, $arguments);
     /** @var SelectOrOtherWidgetBase $mock */
     $mock = $this->widgetBaseMock;
     $mock->setStringTranslation($this->getStringTranslationStub());
@@ -92,7 +93,7 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
   public function testSettingsSummary() {
     /** @var SelectOrOtherWidgetBase $mock */
     $mock = $this->widgetBaseMock;
-    $elementTypeOptions = new ReflectionMethod($this::$testedClassName, 'selectElementTypeOptions');
+    $elementTypeOptions = new ReflectionMethod($this->testedClassName, 'selectElementTypeOptions');
     $elementTypeOptions->setAccessible(TRUE);
     $options = $elementTypeOptions->invoke($mock);
     foreach ($options as $option => $label) {
@@ -119,12 +120,12 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
       ->method('isRequired')
       ->will($this->onConsecutiveCalls(TRUE, FALSE));
 
-    $isMultiple = new ReflectionMethod($this::$testedClassName, 'isMultiple');
+    $isMultiple = new ReflectionMethod($this->testedClassName, 'isMultiple');
     $isMultiple->setAccessible(TRUE);
     $this->assertTrue($isMultiple->invoke($this->widgetBaseMock));
     $this->assertFalse($isMultiple->invoke($this->widgetBaseMock));
 
-    $isRequired = new ReflectionMethod($this::$testedClassName, 'isRequired');
+    $isRequired = new ReflectionMethod($this->testedClassName, 'isRequired');
     $isRequired->setAccessible(TRUE);
     $this->assertTrue($isRequired->invoke($this->widgetBaseMock));
     $this->assertFalse($isRequired->invoke($this->widgetBaseMock));
@@ -164,7 +165,7 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
       ->willReturnOnConsecutiveCalls($entity1, $entity2, $entity1, $entity2);
 
     // Make getSelectedOptions accessible.
-    $getSelectedOptionsMethod = new ReflectionMethod($this::$testedClassName, 'getSelectedOptions');
+    $getSelectedOptionsMethod = new ReflectionMethod($this->testedClassName, 'getSelectedOptions');
     $getSelectedOptionsMethod->setAccessible(TRUE);
 
     $expected = [];

@@ -133,7 +133,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     ];
 
     // The rest of the $element is built by child method implementations.
-
     return $element;
   }
 
@@ -164,7 +163,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     // Drupal\Core\Field\WidgetBase::submit() expects values as
     // an array of values keyed by delta first, then by column, while our
     // widgets return the opposite.
-
     if (is_array($element['#value'])) {
       $values = array_values($element['#value']);
     }
