@@ -6,14 +6,11 @@
 
 namespace Drupal\select_or_other\Element;
 
-
 use Drupal\Core\Form\FormStateInterface;
-
 
 /**
  * Provides a form element with buttons and other option.
  *
- * Properties:
  * @see ElementBase
  *
  * @FormElement("select_or_other_buttons")
@@ -36,7 +33,7 @@ class Buttons extends ElementBase {
   /**
    * Sets the type of buttons to use for the select element.
    *
-   * @param $element
+   * @param array $element
    *   The select or other element.
    */
   protected static function setSelectType(&$element) {
@@ -52,7 +49,7 @@ class Buttons extends ElementBase {
   /**
    * Ensures the element has the correct default value.
    *
-   * @param $element
+   * @param array $element
    *   The select or other element.
    */
   protected static function ensureCorrectDefaultValue(&$element) {
@@ -67,7 +64,7 @@ class Buttons extends ElementBase {
   /**
    * Adds a #states array to the other field to make hide/show work.
    *
-   * @param $element
+   * @param array $element
    *   The select or other element.
    */
   protected static function addStatesHandling(&$element) {
@@ -82,7 +79,8 @@ class Buttons extends ElementBase {
   /**
    * Adds an empty option to the select element if required.
    *
-   * @param $element
+   * @param array $element
+   *   The select or other element.
    */
   protected static function addEmptyOption(&$element) {
     if (!isset($element['#no_empty_option']) || !$element['#no_empty_option']) {

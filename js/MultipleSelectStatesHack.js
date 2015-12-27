@@ -1,4 +1,6 @@
 /**
+ * This is a work around for drupal core issue #1149078.
+ *
  * @file MultipleSelectStatesHack.js
  */
 
@@ -30,7 +32,7 @@
     attach: function (context) {
       $(".js-form-type-select-or-other-select", context).once().each(function () {
         var $select = $('select', this);
-        // Hide the other field if applicable
+        // Hide the other field if applicable.
         select_or_other_check_and_show($select, 0);
         $select.addClass('select-or-other-initialized');
 

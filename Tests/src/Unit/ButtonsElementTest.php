@@ -4,8 +4,6 @@ namespace Drupal\Tests\select_or_other\Unit {
 
   use Drupal\Core\Form\FormState;
   use Drupal\select_or_other\Element\Buttons;
-  use Drupal\select_or_other\Element\ElementBase;
-  use Drupal\select_or_other\Element\Select;
   use Drupal\Tests\UnitTestCase;
   use ReflectionMethod;
 
@@ -100,26 +98,26 @@ namespace Drupal\Tests\select_or_other\Unit {
         ]
       ];
       $arguments = [&$element];
-      $ensureCorrectDefaultValue = new ReflectionMethod('Drupal\select_or_other\Element\Buttons', 'ensureCorrectDefaultValue');
-      $ensureCorrectDefaultValue->setAccessible(TRUE);
+      $ensure_correct_default_value = new ReflectionMethod('Drupal\select_or_other\Element\Buttons', 'ensureCorrectDefaultValue');
+      $ensure_correct_default_value->setAccessible(TRUE);
 
       $expected = $element;
-      $ensureCorrectDefaultValue->invokeArgs(NULL, $arguments);
+      $ensure_correct_default_value->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $element['select']['#default_value'] = 'non_array_default';
       $expected = $element;
-      $ensureCorrectDefaultValue->invokeArgs(NULL, $arguments);
+      $ensure_correct_default_value->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $element['select']['#default_value'] = ['array_default'];
       $expected['select']['#default_value'] = 'array_default';
-      $ensureCorrectDefaultValue->invokeArgs(NULL, $arguments);
+      $ensure_correct_default_value->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['select']['#type'] = $element['select']['#type'] = 'checkboxes';
       $expected['select']['#default_value'] = $element['select']['#default_value'] = ['array_default'];
-      $ensureCorrectDefaultValue->invokeArgs(NULL, $arguments);
+      $ensure_correct_default_value->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
     }
 
@@ -134,47 +132,47 @@ namespace Drupal\Tests\select_or_other\Unit {
           '#options' => [],
         ],
       ];
-      $arguments = [&$element];
-      $addEmptyOption = new ReflectionMethod('Drupal\select_or_other\Element\Buttons', 'addEmptyOption');
-      $addEmptyOption->setAccessible(TRUE);
+      $arguments = [ & $element];
+      $add_empty_option = new ReflectionMethod('Drupal\select_or_other\Element\Buttons', 'addEmptyOption');
+      $add_empty_option->setAccessible(TRUE);
 
       $expected = $element;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#multiple'] = $element['#multiple'] = FALSE;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#required'] = $element['#required'] = FALSE;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#default_value'] = $element['#default_value'] = [];
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#default_value'] = $element['#default_value'] = ['test'];
       $expected['select']['#options'] = [
         '' => '- None -',
       ];
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#default_value'] = $element['#default_value'] = 'test';
       $expected['select']['#options'] = [
         '' => '- None -',
       ];
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $expected['#no_empty_option'] = $element['#no_empty_option'] = FALSE;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
-      $element['#no_empty_option'] = true;
+      $element['#no_empty_option'] = TRUE;
       $expected = $element;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
     }
 

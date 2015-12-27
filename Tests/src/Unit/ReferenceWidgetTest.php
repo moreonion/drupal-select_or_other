@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ReferenceWidgetTest extends UnitTestCase {
 
-  protected static $testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget';
+  protected $testedClassName;
 
   /**
    * @var PHPUnit_Framework_MockObject_MockBuilder $stub
@@ -34,6 +34,7 @@ class ReferenceWidgetTest extends UnitTestCase {
 
   protected function setUp() {
     parent::setUp();
+    $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget';
     $container_class = 'Drupal\Core\DependencyInjection\Container';
     $methods = get_class_methods($container_class);
     /** @var ContainerInterface $container */
@@ -43,7 +44,7 @@ class ReferenceWidgetTest extends UnitTestCase {
       ->getMock();
     \Drupal::setContainer($container);
 
-    $this->mockBuilder = $this->getMockBuilder($this::$testedClassName);
+    $this->mockBuilder = $this->getMockBuilder($this->testedClassName);
   }
 
   /**
@@ -197,7 +198,7 @@ class ReferenceWidgetTest extends UnitTestCase {
    * Tests preparation for EntityAutocomplete::validateEntityAutocomplete.
    */
   public function testPrepareElementValuesForValidation() {
-    $method = new ReflectionMethod($this::$testedClassName, 'prepareElementValuesForValidation');
+    $method = new ReflectionMethod($this->testedClassName, 'prepareElementValuesForValidation');
     $method->setAccessible(TRUE);
 
     foreach ([FALSE, TRUE] as $tags) {

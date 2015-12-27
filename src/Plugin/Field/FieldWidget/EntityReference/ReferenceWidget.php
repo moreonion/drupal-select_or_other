@@ -46,14 +46,14 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
   }
 
   /**
-   * Retrieves the entityStorage object
+   * Retrieves the entityStorage object.
    *
    * @return \Drupal\Core\Entity\EntityStorageInterface
    *   EntityStorage for entity types that can be referenced by this widget.
    *
    * @codeCoverageIgnore
    *   Ignore this method because if ::getFieldSetting() or entityTypeManager
-   *   does not return the expected result, we've got other problems on our hands.
+   *   does not return the expected result, we have other problems on our hands.
    */
   protected function getEntityStorage() {
     $target_type = $this->getFieldSetting('target_type');
@@ -72,7 +72,9 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
    *   return the expected result, we've got other problems on our hands.
    */
   protected function getBundleKey() {
-    $entity_keys = $this->getEntityStorage()->getEntityType()->get('entity_keys');
+    $entity_keys = $this->getEntityStorage()
+      ->getEntityType()
+      ->get('entity_keys');
     return $entity_keys['bundle'];
   }
 
@@ -83,12 +85,12 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
     $options = [];
 
     // Prepare properties to use for loading.
-    $entityStorage = $this->getEntityStorage();
+    $entity_storage = $this->getEntityStorage();
     $bundle_key = $this->getBundleKey();
     $target_bundles = $this->getSelectionHandlerSetting('target_bundles');
     $properties = [$bundle_key => $target_bundles];
 
-    $entities = $entityStorage->loadByProperties($properties);
+    $entities = $entity_storage->loadByProperties($properties);
 
     // Prepare the options.
     foreach ($entities as $entity) {
@@ -102,15 +104,15 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
    * {@inheritdoc}
    */
   protected function prepareSelectedOptions(array $options) {
-  $prepared_options = [];
-  $entities = $this->getEntityStorage()->loadMultiple($options);
+    $prepared_options = [];
+    $entities = $this->getEntityStorage()->loadMultiple($options);
 
-  foreach ($entities as $entity) {
-    $prepared_options[] = "{$entity->label()} ({$entity->id()})";
+    foreach ($entities as $entity) {
+      $prepared_options[] = "{$entity->label()} ({$entity->id()})";
+    }
+
+    return $prepared_options;
   }
-
-  return $prepared_options;
-}
 
   /**
    * {@inheritdoc}
@@ -216,7 +218,8 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $options = $field_definition->getSettings();
-    $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
+    $handler = \Drupal::service('plugin.manager.entity_reference_selection')
+      ->getInstance($options);
     return $handler instanceof SelectionWithAutocreateInterface && $options['handler_settings']['auto_create'];
   }
 

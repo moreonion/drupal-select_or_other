@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- *  Contains \Drupal\select_or_other\Tests\TestBase.
+ * Contains \Drupal\select_or_other\Tests\TestBase.
  */
 
 namespace Drupal\select_or_other\Tests;
@@ -9,15 +9,15 @@ namespace Drupal\select_or_other\Tests;
 use Drupal\simpletest\WebTestBase;
 
 /**
- *  Base test class for select or other widgets.
+ * Base test class for select or other widgets.
  *
  * @codeCoverageIgnore
- *   Our unittests do not have to cover the integration tests.
+ *   Our unit tests do not have to cover the integration tests.
  */
 abstract class TestBase extends WebTestBase {
 
   /**
-   * @var array
+   * @var array $defaultPermissions
    *   The default permissions to give to a newly created user.
    */
   protected $defaultPermissions;
@@ -29,12 +29,11 @@ abstract class TestBase extends WebTestBase {
    *   - Cardinality (1, -1)
    *   - field_settings @see field_info_field().
    *   - instance_settings @see field_info_instance().
-   *
    */
   protected $fields;
 
   /**
-   * @var array
+   * @var array $modules
    *   The module(s) to enable when running these tests.
    */
   public static $modules = ['block', 'select_or_other'];
@@ -96,17 +95,19 @@ abstract class TestBase extends WebTestBase {
 
   /**
    * Generate content types and fields for testing.
+   *
    * @param string $field_type
    *   The type of field to create.
    * @param array $field_settings
+   *   The field settings.
    * @param string $widget
+   *   The widget to use.
    * @param array $select_types
+   *   Which select elements should be used.
    * @param array $widget_settings
    *   The widget settings.
-   * @param $field_formatter
-   *   Machine name of the field formatter to use for display.
    */
-  protected function prepareTestFields($field_type, array $field_settings, $widget, array $select_types, $widget_settings, $field_formatter) {
+  protected function prepareTestFields($field_type, array $field_settings, $widget, array $select_types, array $widget_settings) {
     // Configure fields.
     foreach ($select_types as $select_type) {
       foreach (array(1, -1) as $cardinality) {
@@ -129,7 +130,7 @@ abstract class TestBase extends WebTestBase {
             ->create(['vid' => strtolower($vocabulary), 'name' => $vocabulary])
             ->save();
 
-          // Create the field
+          // Create the field.
           $field_defaults = [
             'field_name' => $field_name,
             'entity_type' => 'node',
@@ -145,7 +146,7 @@ abstract class TestBase extends WebTestBase {
             ->create($field_info)
             ->save();
 
-          // Create the instance
+          // Create the instance.
           $instance_info = $field_defaults + [
               'field_type' => $field_type,
               'required' => $required,
@@ -163,7 +164,6 @@ abstract class TestBase extends WebTestBase {
             ->getStorage('field_config')
             ->create($instance_info);
           $instance->save();
-
 
           entity_get_form_display('node', $bundle, 'default')
             ->setComponent($field_name, [
@@ -183,9 +183,13 @@ abstract class TestBase extends WebTestBase {
 
   /**
    * Submit the add node form with the selected values.
-   * @param $field_name
-   * @param $select
-   * @param $other
+   *
+   * @param string $field_name
+   *   Name of the field.
+   * @param string $select
+   *   Value to set on the select element.
+   * @param string $other
+   *   Value to set for the other element.
    */
   protected function setFieldValue($field_name, $select, $other = '') {
     $edit = array();
@@ -221,8 +225,9 @@ abstract class TestBase extends WebTestBase {
   /**
    * Returns the machine name of the content type a field is configured on.
    *
-   * @param $field_name
+   * @param string $field_name
    *   The field machine name of which to retrieve the content type.
+   *
    * @return string|null
    *   The content type machine name or NULL if not found.
    */

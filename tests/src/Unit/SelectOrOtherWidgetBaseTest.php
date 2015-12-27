@@ -1,4 +1,7 @@
 <?php
+/**
+ * Tests for the SelectOrOtherWidgetBase class.
+ */
 
 namespace Drupal\tests\select_or_other\Unit;
 
@@ -12,27 +15,38 @@ use ReflectionMethod;
  * Tests the form element implementation.
  *
  * @group select_or_other
+ *
  * @covers Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase
  */
 class SelectOrOtherWidgetBaseTest extends UnitTestCase {
 
+  /**
+   * @var string $testedClassName
+   *   The fully specified name of the class under test.
+   */
   protected $testedClassName;
 
   /**
    * @var PHPUnit_Framework_MockObject_MockObject $stub
+   *   A very basic mock of the class under test.
    */
   protected $widgetBaseMock;
 
   /**
    * @var PHPUnit_Framework_MockObject_MockObject $fieldDefinition
+   *   Mocked field definition.
    */
   protected $fieldDefinition;
 
   /**
    * @var PHPUnit_Framework_MockObject_MockObject $containerMock
+   *   Mocked container.
    */
   protected $containerMock;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase';
@@ -62,7 +76,7 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
   }
 
   /**
-   * Tests functionality of SelectOrOtherWidgetBase::settingsForm
+   * Tests functionality of SelectOrOtherWidgetBase::settingsForm.
    */
   public function testSettingsForm() {
     $dummy_form = [];
@@ -88,14 +102,14 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
   }
 
   /**
-   * Tests the functionality of SelectOrOtherWidgetBase::settingsSummary
+   * Tests the functionality of SelectOrOtherWidgetBase::settingsSummary.
    */
   public function testSettingsSummary() {
     /** @var SelectOrOtherWidgetBase $mock */
     $mock = $this->widgetBaseMock;
-    $elementTypeOptions = new ReflectionMethod($this->testedClassName, 'selectElementTypeOptions');
-    $elementTypeOptions->setAccessible(TRUE);
-    $options = $elementTypeOptions->invoke($mock);
+    $element_type_options = new ReflectionMethod($this->testedClassName, 'selectElementTypeOptions');
+    $element_type_options->setAccessible(TRUE);
+    $options = $element_type_options->invoke($mock);
     foreach ($options as $option => $label) {
       $mock->setSetting('select_element_type', $option);
 
@@ -110,26 +124,25 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
    * Tests the functionality of several small helper methods.
    */
   public function testHelperMethods() {
-    $storageStub = $this->getMockForAbstractClass('\Drupal\Core\Field\FieldStorageDefinitionInterface');
-    $storageStub->expects($this->exactly(2))
+    $storage_stub = $this->getMockForAbstractClass('\Drupal\Core\Field\FieldStorageDefinitionInterface');
+    $storage_stub->expects($this->exactly(2))
       ->method('isMultiple')->will($this->onConsecutiveCalls(TRUE, FALSE));
     $this->fieldDefinition->expects($this->exactly(2))
       ->method('getFieldStorageDefinition')
-      ->willReturn($storageStub);
+      ->willReturn($storage_stub);
     $this->fieldDefinition->expects($this->exactly(2))
       ->method('isRequired')
       ->will($this->onConsecutiveCalls(TRUE, FALSE));
 
-    $isMultiple = new ReflectionMethod($this->testedClassName, 'isMultiple');
-    $isMultiple->setAccessible(TRUE);
-    $this->assertTrue($isMultiple->invoke($this->widgetBaseMock));
-    $this->assertFalse($isMultiple->invoke($this->widgetBaseMock));
+    $is_multiple = new ReflectionMethod($this->testedClassName, 'isMultiple');
+    $is_multiple->setAccessible(TRUE);
+    $this->assertTrue($is_multiple->invoke($this->widgetBaseMock));
+    $this->assertFalse($is_multiple->invoke($this->widgetBaseMock));
 
-    $isRequired = new ReflectionMethod($this->testedClassName, 'isRequired');
-    $isRequired->setAccessible(TRUE);
-    $this->assertTrue($isRequired->invoke($this->widgetBaseMock));
-    $this->assertFalse($isRequired->invoke($this->widgetBaseMock));
-
+    $is_required = new ReflectionMethod($this->testedClassName, 'isRequired');
+    $is_required->setAccessible(TRUE);
+    $this->assertTrue($is_required->invoke($this->widgetBaseMock));
+    $this->assertFalse($is_required->invoke($this->widgetBaseMock));
 
   }
 
@@ -137,9 +150,8 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
   /**
    * Tests the functionality of SelectOrOtherWidgetBase::getSelectedOptions.
    */
-  public
-  function testGetSelectedOptions() {
-    // Mock the widget
+  public function testGetSelectedOptions() {
+    // Mock the widget.
     $mock = $this->getMockBuilder('Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase')
       ->disableOriginalConstructor()
       ->setMethods(['getColumn', 'getOptions'])
@@ -165,16 +177,16 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
       ->willReturnOnConsecutiveCalls($entity1, $entity2, $entity1, $entity2);
 
     // Make getSelectedOptions accessible.
-    $getSelectedOptionsMethod = new ReflectionMethod($this->testedClassName, 'getSelectedOptions');
-    $getSelectedOptionsMethod->setAccessible(TRUE);
+    $get_selected_options = new ReflectionMethod($this->testedClassName, 'getSelectedOptions');
+    $get_selected_options->setAccessible(TRUE);
 
     $expected = [];
-    $selected_options = $getSelectedOptionsMethod->invokeArgs($mock, [$items]);
+    $selected_options = $get_selected_options->invokeArgs($mock, [$items]);
     $this->assertArrayEquals($expected, $selected_options, 'Selected options without a matching option are filtered out.');
 
     /** @var SelectOrOtherWidgetBase $mock */
     $expected = [1, 3];
-    $selected_options = $getSelectedOptionsMethod->invokeArgs($mock, [$items]);
+    $selected_options = $get_selected_options->invokeArgs($mock, [$items]);
     $this->assertArrayEquals($expected, $selected_options, 'Selected options with matching options are kept.');
   }
 

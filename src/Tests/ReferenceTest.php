@@ -2,15 +2,16 @@
 
 /**
  * @file
- *   Contains \Drupal\select_or_other\Tests\ReferenceTest.
+ * Contains \Drupal\select_or_other\Tests\ReferenceTest.
  */
 
 namespace Drupal\select_or_other\Tests;
 
 /**
  * Tests the the functionality of the Reference widget.
+ *
  * @codeCoverageIgnore
- *   Our unittests do not have to cover the integration tests.
+ *   Our unit tests do not have to cover the integration tests.
  *
  * @group 'Select or other'
  */
@@ -38,7 +39,7 @@ class ReferenceTest extends TestBase {
   /**
    * Make sure an empty option is present when relevant.
    */
-  function testEmptyOption($empty_option = '') {
+  public function testEmptyOption($empty_option = '') {
     parent::testEmptyOption('My cool new value');
   }
 

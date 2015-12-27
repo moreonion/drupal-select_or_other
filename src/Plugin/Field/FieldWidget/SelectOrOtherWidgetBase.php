@@ -35,9 +35,10 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   const SELECT_OR_OTHER_EMPTY_SELECT = 'options_select';
 
   /**
-   * @var string
+   * @var bool $hasValue.
+   *   Whether or not the widget has a value.
    */
-  private $has_value;
+  private $hasValue;
 
   /**
    * Helper method to determine the identifying column for the field.
@@ -60,6 +61,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    * Helper method to determine if the field supports multiple values.
    *
    * @return bool
+   *   Whether the field supports multiple values or not.
    */
   protected function isMultiple() {
     return $this->fieldDefinition->getFieldStorageDefinition()->isMultiple();
@@ -67,7 +69,9 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
   /**
    * Helper method to determine if the field is required.
+   *
    * @return bool
+   *   Whether the field is required or not.
    */
   protected function isRequired() {
     return $this->fieldDefinition->isRequired();
@@ -120,7 +124,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     // Prepare some properties for the child methods to build the actual form
     // element.
-    $this->has_value = isset($items[0]->{$this->getColumn()});
+    $this->hasValue = isset($items[0]->{$this->getColumn()});
 
     $element += [
       '#no_empty_option' => $this->isDefaultValueWidget($form_state),
@@ -137,13 +141,13 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   }
 
   /**
-   *
    * Return whether $items of formElement method contains any data.
    *
    * @return bool
+   *   Whether the element has a value or not.
    */
   public function hasValue() {
-    return $this->has_value;
+    return $this->hasValue;
   }
 
   /**
@@ -251,15 +255,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    */
   protected function supportsGroups() {
     return FALSE;
-  }
-
-  /**
-   * Returns the empty option to add to the list of options, if any.
-   *
-   * @return string|null
-   *   Either static::OPTIONS_EMPTY_NONE, static::OPTIONS_EMPTY_SELECT, or NULL.
-   */
-  protected function getEmptyOption() {
   }
 
   /**

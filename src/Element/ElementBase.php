@@ -22,7 +22,6 @@ use Drupal\Core\Render\Element\FormElement;
  *   each option, and the values are the options to be presented to the user.
  * - #empty_option: The label that will be displayed to denote no selection.
  * - #empty_value: The value of the option that is used to denote no selection.
- *
  */
 abstract class ElementBase extends FormElement {
 
@@ -40,19 +39,20 @@ abstract class ElementBase extends FormElement {
    *
    * @param string $state
    *   The state the element should have.
-   * @param string $elementName
+   * @param string $element_name
    *   The name of the element on which this state depends.
-   * @param string $valueKey
-   * @param string $value
+   * @param string $value_key
+   *   The key used to select the property on which the state depends.
+   * @param mixed $value
+   *   The value a property should have to trigger the state.
    *
    * @return array
    *   An array with state information to be used in a #states array.
-   *
    */
-  protected static function prepareState($state, $elementName, $valueKey, $value) {
+  protected static function prepareState($state, $element_name, $value_key, $value) {
     return [
       $state => [
-        ':input[name="' . $elementName . '"]' => [$valueKey => $value],
+        ':input[name="' . $element_name . '"]' => [$value_key => $value],
       ],
     ];
   }
@@ -66,7 +66,9 @@ abstract class ElementBase extends FormElement {
     return array(
       '#input' => TRUE,
       '#process' => [
-        [$class, 'processSelectOrOther'],
+        [
+          $class, 'processSelectOrOther'
+        ],
       ],
       '#multiple' => FALSE,
       '#select_type' => 'list',
@@ -91,7 +93,8 @@ abstract class ElementBase extends FormElement {
   /**
    * Adds the 'select' field to the element.
    *
-   * @param $element
+   * @param array $element
+   *   The select or other element.
    */
   protected static function addSelectField(&$element) {
     $element['select'] = [
@@ -106,7 +109,8 @@ abstract class ElementBase extends FormElement {
   /**
    * Adds the 'other' field to the element.
    *
-   * @param $element
+   * @param array $element
+   *   The select or other element.
    */
   protected static function addOtherField(&$element) {
     $element['other'] = [
