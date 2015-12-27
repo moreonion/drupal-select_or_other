@@ -1,0 +1,33 @@
+field.widget.settings.select_or_other_reference:
+  type: mapping
+  label: 'Select or other reference widget display format settings'
+  mapping:
+    select_element_type:
+      type: string
+      label: 'Type of select form element'
+
+field.widget.settings.select_or_other:
+  type: mapping
+  label: 'Select or other widget display format settings'
+  mapping:
+    select_element_type:
+      type: string
+      label: 'Type of select form element'
+    available_options:
+      type: string
+      label: 'Available options'
+    other:
+      type: label
+      label: "'Other' option label"
+    other_title:
+      type: label
+      label: "'Other' field title"
+    other_unknown_defaults:
+      type: string
+      label: 'How to handle values that are not in the available options'
+    other_size:
+      type: integer
+      label: "'Other' field size"
+    sort_options:
+      type: boolean
+      label: 'Wether to sort the options in the list alphabetically by value'

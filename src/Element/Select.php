@@ -25,10 +25,45 @@ class Select extends ElementBase {
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
     $element = parent::processSelectOrOther($element, $form_state, $complete_form);
 
-    $element['select']['#type'] = 'select';
+    self::setSelectType($element);
+    self::addEmptyOption($element);
+    self::addStatesHandling($element);
 
+    return $element;
+  }
+
+  /**
+   * Sets the type of buttons to use for the select element.
+   *
+   * @param $element
+   *   The select or other element.
+   */
+  protected static function setSelectType(&$element) {
+    $element['select']['#type'] = 'select';
+  }
+
+  /**
+   * Adds an empty option to the select element if required.
+   *
+   * @param $element
+   */
+  protected static function addEmptyOption(&$element) {
+    if (!isset($element['#no_empty_option']) || !$element['#no_empty_option']) {
+      if (!$element['#required'] || empty($element['#default_value'])) {
+        $element['select']['#empty_value'] = '';
+      }
+    }
+  }
+
+  /**
+   * Adds a #states array to the other field to make hide/show work.
+   *
+   * @param $element
+   *   The select or other element.
+   */
+  protected static function addStatesHandling(&$element) {
     if (!$element['#multiple']) {
-      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
+      $element['other']['#states'] = self::prepareState('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }
     else {
       $element['select']['#multiple'] = TRUE;
@@ -40,8 +75,6 @@ class Select extends ElementBase {
         'library' => ['select_or_other/multiple_select_states_hack']
       ];
     }
-
-    return $element;
   }
 
 }

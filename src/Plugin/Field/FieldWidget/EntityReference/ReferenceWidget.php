@@ -206,7 +206,9 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
    */
   public static function validateReferenceWidget(array &$element, FormStateInterface $form_state, array &$complete_form) {
     self::prepareElementValuesForValidation($element);
-    EntityAutocomplete::validateEntityAutocomplete($element, $form_state, $complete_form);
+    if (!empty($element['#value'])) {
+      EntityAutocomplete::validateEntityAutocomplete($element, $form_state, $complete_form);
+    }
   }
 
   /**

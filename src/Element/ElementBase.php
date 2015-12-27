@@ -36,14 +36,20 @@ abstract class ElementBase extends FormElement {
   }
 
   /**
-   * Prepares a form API #states array.
-   * @param $state
-   * @param $elementName
-   * @param $valueKey
-   * @param $value
+   * Prepares an array to be used as a state in a form API #states array.
+   *
+   * @param string $state
+   *   The state the element should have.
+   * @param string $elementName
+   *   The name of the element on which this state depends.
+   * @param string $valueKey
+   * @param string $value
+   *
    * @return array
+   *   An array with state information to be used in a #states array.
+   *
    */
-  protected static function prepareStates($state, $elementName, $valueKey, $value) {
+  protected static function prepareState($state, $elementName, $valueKey, $value) {
     return [
       $state => [
         ':input[name="' . $elementName . '"]' => [$valueKey => $value],
@@ -77,21 +83,36 @@ abstract class ElementBase extends FormElement {
    * Expands the select or other element to have a 'select' and 'other' field.
    */
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
+    self::addSelectField($element);
+    self::addOtherField($element);
+    return $element;
+  }
+
+  /**
+   * Adds the 'select' field to the element.
+   *
+   * @param $element
+   */
+  protected static function addSelectField(&$element) {
     $element['select'] = [
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
       '#multiple' => $element['#multiple'],
-      '#options' => ElementBase::addOtherOption($element['#options']),
+      '#options' => self::addOtherOption($element['#options']),
       '#weight' => 10,
     ];
+  }
 
-    // Create the 'other' textfield.
+  /**
+   * Adds the 'other' field to the element.
+   *
+   * @param $element
+   */
+  protected static function addOtherField(&$element) {
     $element['other'] = [
       '#type' => 'textfield',
       '#weight' => 20,
     ];
-
-    return $element;
   }
 
   /**

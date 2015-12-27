@@ -75,16 +75,14 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
   /**
    * {@inheritdoc}
+   *
+   * @codeCoverageIgnore
+   *   Ignore this method because we would be testing if a hard coded array is
+   *   equal to another hard coded array.
    */
   public static function defaultSettings() {
     return [
       'select_element_type' => 'select_or_other_select',
-      'available_options' => '',
-      'other' => 'Other',
-      'other_title' => '',
-      'other_unknown_defaults' => 'other',
-      'other_size' => 60,
-      'sort_options' => 0,
     ] + parent::defaultSettings();
   }
 
@@ -125,11 +123,11 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $this->has_value = isset($items[0]->{$this->getColumn()});
 
     $element += [
+      '#no_empty_option' => $this->isDefaultValueWidget($form_state),
       '#type' => $this->getSetting('select_element_type'),
       '#options' => $this->getOptions(),
       '#default_value' => $this->getSelectedOptions($items),
-      // Do not display a 'multiple' select box if there is only one option.
-      '#multiple' => $this->isMultiple() && count($this->getOptions()) > 1,
+      '#multiple' => $this->isMultiple(),
       '#key_column' => $this->getColumn(),
       '#element_validate' => [[get_class($this), 'validateElement']],
     ];

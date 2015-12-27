@@ -32,6 +32,20 @@ class Widget extends SelectOrOtherWidgetBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'available_options' => '',
+      'other' => 'Other',
+      'other_title' => '',
+      'other_unknown_defaults' => 'other',
+      'other_size' => 60,
+      'sort_options' => 0,
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $form = parent::settingsForm($form, $form_state);
 

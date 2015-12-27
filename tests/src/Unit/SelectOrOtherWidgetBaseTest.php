@@ -61,24 +61,6 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
   }
 
   /**
-   * Test if defaultSettings() returns the correct keys.
-   */
-  public function testDefaultSettings() {
-    $expected_keys = [
-      'select_element_type',
-      'available_options',
-      'other',
-      'other_title',
-      'other_unknown_defaults',
-      'other_size',
-      'sort_options',
-    ];
-
-    $actual_keys = array_keys(SelectOrOtherWidgetBase::defaultSettings());
-    $this->assertArrayEquals($expected_keys, $actual_keys);
-  }
-
-  /**
    * Tests functionality of SelectOrOtherWidgetBase::settingsForm
    */
   public function testSettingsForm() {

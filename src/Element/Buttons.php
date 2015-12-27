@@ -26,16 +26,70 @@ class Buttons extends ElementBase {
   public static function processSelectOrOther(&$element, FormStateInterface $form_state, &$complete_form) {
     $element = parent::processSelectOrOther($element, $form_state, $complete_form);
 
-    if (!$element['#multiple']) {
-      $element['select']['#type'] = 'radios';
-      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
-    }
-    else {
-      $element['select']['#type'] = 'checkboxes';
-      $element['other']['#states'] = ElementBase::prepareStates('visible', $element['#name'] . '[select][select_or_other]', 'checked', TRUE);
-    }
+    self::setSelectType($element);
+    self::addStatesHandling($element);
+    self::addEmptyOption($element);
 
     return $element;
+  }
+
+  /**
+   * Sets the type of buttons to use for the select element.
+   *
+   * @param $element
+   *   The select or other element.
+   */
+  protected static function setSelectType(&$element) {
+    if ($element['#multiple']) {
+      $element['select']['#type'] = 'checkboxes';
+    }
+    else {
+      $element['select']['#type'] = 'radios';
+      self::ensureCorrectDefaultValue($element);
+    }
+  }
+
+  /**
+   * Ensures the element has the correct default value.
+   *
+   * @param $element
+   *   The select or other element.
+   */
+  protected static function ensureCorrectDefaultValue(&$element) {
+    if ($element['select']['#type'] === 'radios') {
+      // Radio buttons do not accept an array as default value.
+      if (!empty($element['select']['#default_value']) && is_array($element['select']['#default_value'])) {
+        $element['select']['#default_value'] = reset($element['select']['#default_value']);
+      }
+    }
+  }
+
+  /**
+   * Adds a #states array to the other field to make hide/show work.
+   *
+   * @param $element
+   *   The select or other element.
+   */
+  protected static function addStatesHandling(&$element) {
+    if (!$element['#multiple']) {
+      $element['other']['#states'] = self::prepareState('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
+    }
+    else {
+      $element['other']['#states'] = self::prepareState('visible', $element['#name'] . '[select][select_or_other]', 'checked', TRUE);
+    }
+  }
+
+  /**
+   * Adds an empty option to the select element if required.
+   *
+   * @param $element
+   */
+  protected static function addEmptyOption(&$element) {
+    if (!isset($element['#no_empty_option']) || !$element['#no_empty_option']) {
+      if (!$element['#multiple'] && !$element['#required'] && !empty($element['#default_value'])) {
+        $element['select']['#options'] = ['' => t('- None -')] + $element['select']['#options'];
+      }
+    }
   }
 
 }
