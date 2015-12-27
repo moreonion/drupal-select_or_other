@@ -1,10 +1,12 @@
 <?php
+/**
+ * @file
+ * Contains unit tests for the Select form element.
+ */
 
 namespace Drupal\Tests\select_or_other\Unit {
 
   use Drupal\Core\Form\FormState;
-  use Drupal\select_or_other\Element\Buttons;
-  use Drupal\select_or_other\Element\ElementBase;
   use Drupal\select_or_other\Element\Select;
   use Drupal\Tests\UnitTestCase;
   use ReflectionMethod;
@@ -13,6 +15,7 @@ namespace Drupal\Tests\select_or_other\Unit {
    * Tests the form element implementation.
    *
    * @group select_or_other
+   *
    * @covers \Drupal\select_or_other\Element\Select
    */
   class SelectElementTest extends UnitTestCase {
@@ -54,7 +57,7 @@ namespace Drupal\Tests\select_or_other\Unit {
           ]
         ];
 
-      // Test single cardinality Select
+      // Test single cardinality Select.
       $element = $original_element;
       $expected_element = array_merge_recursive($base_expected_element, [
         'select' => ['#type' => 'select'],
@@ -70,7 +73,7 @@ namespace Drupal\Tests\select_or_other\Unit {
       $this->assertArrayEquals($expected_element, $resulting_element);
       $this->assertArrayEquals($resulting_element, $element);
 
-      // Test multiple cardinality Select
+      // Test multiple cardinality Select.
       $element = $original_element;
       $expected_element = array_merge_recursive($base_expected_element, [
         'select' => [
@@ -103,37 +106,37 @@ namespace Drupal\Tests\select_or_other\Unit {
         ]
       ];
 
-      $arguments = [&$element];
-      $addEmptyOption = new ReflectionMethod('Drupal\select_or_other\Element\Select', 'addEmptyOption');
-      $addEmptyOption->setAccessible(TRUE);
+      $arguments = [& $element];
+      $add_empty_option = new ReflectionMethod('Drupal\select_or_other\Element\Select', 'addEmptyOption');
+      $add_empty_option->setAccessible(TRUE);
 
       $expected = $element;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element, 'No empty option is added for required select widgets with a default value.');
 
       $element['#default_value'] = '';
       $expected = $element + $empty_option;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element, 'Empty option is added for required select widgets without a default value.');
 
       $element['#default_value'] = '';
       $element['#required'] = FALSE;
       $expected = $element;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element, 'No empty option is added for non-required select widgets without a default value.');
 
       $element['#default_value'] = 'not empty';
       $expected = $element + $empty_option;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element, 'Empty option is added for non-required select widgets with a default value.');
 
       $expected['#no_empty_option'] = $element['#no_empty_option'] = FALSE;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
 
       $element['#no_empty_option'] = TRUE;
       $expected = $element;
-      $addEmptyOption->invokeArgs(NULL, $arguments);
+      $add_empty_option->invokeArgs(NULL, $arguments);
       $this->assertArrayEquals($expected, $element);
     }
 
