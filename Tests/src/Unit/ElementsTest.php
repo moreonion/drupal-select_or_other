@@ -13,6 +13,7 @@ namespace Drupal\Tests\select_or_other\Unit {
    * Tests the form element implementation.
    *
    * @group select_or_other
+   *
    * @covers \Drupal\select_or_other\Element\ElementBase
    */
   class ElementsTest extends UnitTestCase {
