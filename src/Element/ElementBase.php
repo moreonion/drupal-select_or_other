@@ -66,12 +66,7 @@ abstract class ElementBase extends FormElement {
     $class = get_class($this);
     return array(
       '#input' => TRUE,
-      '#process' => [
-        [
-          $class,
-          'processSelectOrOther'
-        ],
-      ],
+      '#process' => [[$class, 'processSelectOrOther']],
       '#multiple' => FALSE,
       '#select_type' => 'list',
       '#merged_values' => FALSE,

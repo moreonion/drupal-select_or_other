@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\Tests\select_or_other\Unit\ButtonsElementTest
+ * Contains Drupal\Tests\select_or_other\Unit\ButtonsElementTest.
  */
 
 namespace Drupal\Tests\select_or_other\Unit {

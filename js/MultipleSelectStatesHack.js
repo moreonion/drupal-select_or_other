@@ -1,6 +1,6 @@
 /**
  * @file
- * contains a workaround for drupal core issue #1149078.
+ * Contains a workaround for drupal core issue #1149078.
  */
 
 (function ($) {
