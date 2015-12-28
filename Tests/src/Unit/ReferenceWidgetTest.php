@@ -27,16 +27,15 @@ class ReferenceWidgetTest extends UnitTestCase {
 
   protected $testedClassName;
 
-  /**
-   * @var PHPUnit_Framework_MockObject_MockBuilder $stub
-   */
+  /* @var PHPUnit_Framework_MockObject_MockBuilder $stub */
   protected $mockBuilder;
 
-  /**
-   * @var PHPUnit_Framework_MockObject_MockObject $containerMock
-   */
+  /* @var PHPUnit_Framework_MockObject_MockObject $containerMock */
   protected $containerMock;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
     $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget';
@@ -124,7 +123,7 @@ class ReferenceWidgetTest extends UnitTestCase {
       'getAutoCreateBundle'
     ];
 
-    // Get the mockBuilder
+    // Get the mockBuilder.
     if ($tested_class_name) {
       $builder = $this->getMockBuilder($tested_class_name);
     }

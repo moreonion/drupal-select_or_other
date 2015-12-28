@@ -34,10 +34,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    */
   const SELECT_OR_OTHER_EMPTY_SELECT = 'options_select';
 
-  /**
-   * @var bool $hasValue.
-   *   Whether or not the widget has a value.
-   */
+  /* @var bool $hasValue */
   private $hasValue;
 
   /**

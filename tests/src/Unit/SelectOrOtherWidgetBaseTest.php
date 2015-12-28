@@ -1,5 +1,6 @@
 <?php
 /**
+ * @file
  * Tests for the SelectOrOtherWidgetBase class.
  */
 
@@ -20,28 +21,16 @@ use ReflectionMethod;
  */
 class SelectOrOtherWidgetBaseTest extends UnitTestCase {
 
-  /**
-   * @var string $testedClassName
-   *   The fully specified name of the class under test.
-   */
+  /* @var string $testedClassName */
   protected $testedClassName;
 
-  /**
-   * @var PHPUnit_Framework_MockObject_MockObject $stub
-   *   A very basic mock of the class under test.
-   */
+  /* @var PHPUnit_Framework_MockObject_MockObject $stub */
   protected $widgetBaseMock;
 
-  /**
-   * @var PHPUnit_Framework_MockObject_MockObject $fieldDefinition
-   *   Mocked field definition.
-   */
+  /* @var PHPUnit_Framework_MockObject_MockObject $fieldDefinition */
   protected $fieldDefinition;
 
-  /**
-   * @var PHPUnit_Framework_MockObject_MockObject $containerMock
-   *   Mocked container.
-   */
+  /* @var PHPUnit_Framework_MockObject_MockObject $containerMock */
   protected $containerMock;
 
   /**

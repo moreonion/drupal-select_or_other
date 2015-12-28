@@ -1,11 +1,13 @@
 <?php
+/**
+ * @file
+ * Contains Drupal\Tests\select_or_other\Unit\ElementsTest.
+ */
 
 namespace Drupal\Tests\select_or_other\Unit {
 
   use Drupal\Core\Form\FormState;
-  use Drupal\select_or_other\Element\Buttons;
   use Drupal\select_or_other\Element\ElementBase;
-  use Drupal\select_or_other\Element\Select;
   use Drupal\Tests\UnitTestCase;
   use ReflectionMethod;
 

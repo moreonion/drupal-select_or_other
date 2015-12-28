@@ -1,4 +1,8 @@
 <?php
+/**
+ * @file
+ * Contains Drupal\Tests\select_or_other\Unit\ButtonsElementTest
+ */
 
 namespace Drupal\Tests\select_or_other\Unit {
 
@@ -98,7 +102,7 @@ namespace Drupal\Tests\select_or_other\Unit {
           '#type' => 'radios'
         ]
       ];
-      $arguments = [&$element];
+      $arguments = [ & $element];
       $ensure_correct_default_value = new ReflectionMethod('Drupal\select_or_other\Element\Buttons', 'ensureCorrectDefaultValue');
       $ensure_correct_default_value->setAccessible(TRUE);
 

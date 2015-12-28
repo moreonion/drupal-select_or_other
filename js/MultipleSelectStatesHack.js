@@ -1,7 +1,6 @@
 /**
- * This is a work around for drupal core issue #1149078.
- *
- * @file MultipleSelectStatesHack.js
+ * @file
+ * contains a workaround for drupal core issue #1149078.
  */
 
 (function ($) {

@@ -59,6 +59,7 @@ abstract class ElementBase extends FormElement {
 
   /**
    * {@inheritdoc}
+   *
    * @codeCoverageIgnore
    */
   public function getInfo() {
@@ -67,7 +68,8 @@ abstract class ElementBase extends FormElement {
       '#input' => TRUE,
       '#process' => [
         [
-          $class, 'processSelectOrOther'
+          $class,
+          'processSelectOrOther'
         ],
       ],
       '#multiple' => FALSE,
@@ -96,7 +98,7 @@ abstract class ElementBase extends FormElement {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addSelectField(&$element) {
+  protected static function addSelectField(array &$element) {
     $element['select'] = [
       '#default_value' => $element['#default_value'],
       '#required' => $element['#required'],
@@ -112,7 +114,7 @@ abstract class ElementBase extends FormElement {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addOtherField(&$element) {
+  protected static function addOtherField(array &$element) {
     $element['other'] = [
       '#type' => 'textfield',
       '#weight' => 20,

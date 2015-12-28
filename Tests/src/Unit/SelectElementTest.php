@@ -106,7 +106,7 @@ namespace Drupal\Tests\select_or_other\Unit {
         ]
       ];
 
-      $arguments = [& $element];
+      $arguments = [ & $element];
       $add_empty_option = new ReflectionMethod('Drupal\select_or_other\Element\Select', 'addEmptyOption');
       $add_empty_option->setAccessible(TRUE);
 

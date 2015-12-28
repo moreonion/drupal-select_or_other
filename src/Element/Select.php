@@ -37,7 +37,7 @@ class Select extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function setSelectType(&$element) {
+  protected static function setSelectType(array &$element) {
     $element['select']['#type'] = 'select';
   }
 
@@ -47,7 +47,7 @@ class Select extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addEmptyOption(&$element) {
+  protected static function addEmptyOption(array &$element) {
     if (!isset($element['#no_empty_option']) || !$element['#no_empty_option']) {
       if (!$element['#required'] || empty($element['#default_value'])) {
         $element['select']['#empty_value'] = '';
@@ -61,7 +61,7 @@ class Select extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addStatesHandling(&$element) {
+  protected static function addStatesHandling(array &$element) {
     if (!$element['#multiple']) {
       $element['other']['#states'] = self::prepareState('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }

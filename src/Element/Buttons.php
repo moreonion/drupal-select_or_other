@@ -36,7 +36,7 @@ class Buttons extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function setSelectType(&$element) {
+  protected static function setSelectType(array &$element) {
     if ($element['#multiple']) {
       $element['select']['#type'] = 'checkboxes';
     }
@@ -52,7 +52,7 @@ class Buttons extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function ensureCorrectDefaultValue(&$element) {
+  protected static function ensureCorrectDefaultValue(array &$element) {
     if ($element['select']['#type'] === 'radios') {
       // Radio buttons do not accept an array as default value.
       if (!empty($element['select']['#default_value']) && is_array($element['select']['#default_value'])) {
@@ -67,7 +67,7 @@ class Buttons extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addStatesHandling(&$element) {
+  protected static function addStatesHandling(array &$element) {
     if (!$element['#multiple']) {
       $element['other']['#states'] = self::prepareState('visible', $element['#name'] . '[select]', 'value', 'select_or_other');
     }
@@ -82,7 +82,7 @@ class Buttons extends ElementBase {
    * @param array $element
    *   The select or other element.
    */
-  protected static function addEmptyOption(&$element) {
+  protected static function addEmptyOption(array &$element) {
     if (!isset($element['#no_empty_option']) || !$element['#no_empty_option']) {
       if (!$element['#multiple'] && !$element['#required'] && !empty($element['#default_value'])) {
         $element['select']['#options'] = ['' => t('- None -')] + $element['select']['#options'];

@@ -16,13 +16,12 @@ use Drupal\simpletest\WebTestBase;
  */
 abstract class TestBase extends WebTestBase {
 
-  /**
-   * @var array $defaultPermissions
-   *   The default permissions to give to a newly created user.
-   */
+  /* @var array $defaultPermissions */
   protected $defaultPermissions;
 
   /**
+   * Information about the fields used in testing.
+   *
    * @var array $fields
    *   associated array keyed by field_name with the following information:
    *   - Widget (machine name of the widget used)
@@ -32,10 +31,7 @@ abstract class TestBase extends WebTestBase {
    */
   protected $fields;
 
-  /**
-   * @var array $modules
-   *   The module(s) to enable when running these tests.
-   */
+  /* @var array $modules */
   public static $modules = ['block', 'select_or_other'];
 
   /**
