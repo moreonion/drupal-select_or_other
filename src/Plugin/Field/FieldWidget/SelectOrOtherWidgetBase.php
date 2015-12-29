@@ -24,16 +24,6 @@ use Drupal\Core\Form\FormStateInterface;
  */
 abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
-  /**
-   * Identifies a 'None' option.
-   */
-  const SELECT_OR_OTHER_EMPTY_NONE = 'options_none';
-
-  /**
-   * Identifies a 'Select a value' option.
-   */
-  const SELECT_OR_OTHER_EMPTY_SELECT = 'options_select';
-
   /* @var bool $hasValue */
   private $hasValue;
 
