@@ -182,12 +182,11 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *   The form element.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
+   *
+   * @todo Figure out if the code in this method is still relevant as it is a
+   * legacy of the initial port to d8.
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
-    if ($element['#required'] && $element['#value'] == '_none') {
-      $form_state->setError($element, t('@name field is required.', array('@name' => $element['#title'])));
-    }
-
     // Massage submitted form values.
     // Drupal\Core\Field\WidgetBase::submit() expects values as
     // an array of values keyed by delta first, then by column, while our
@@ -197,13 +196,6 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     }
     else {
       $values = array($element['#value']);
-    }
-
-    // Filter out the 'none' option. Use a strict comparison, because
-    // 0 == 'any string'.
-    $index = array_search('_none', $values, TRUE);
-    if ($index !== FALSE) {
-      unset($values[$index]);
     }
 
     // Transpose selections from field => delta to delta => field.
@@ -277,6 +269,9 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *
    * @return bool
    *   TRUE if the widget supports optgroups, FALSE otherwise.
+   *
+   * @codeCoverageIgnore
+   *   No need to test a hardcoded value.
    */
   protected function supportsGroups() {
     return FALSE;
