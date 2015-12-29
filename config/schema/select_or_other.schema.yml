@@ -5,3 +5,6 @@ field.widget.settings.select_or_other_reference:
     select_element_type:
       type: string
       label: 'Type of select form element'
+    sort_options:
+      type: string
+      label: 'Chosen sorting of options'

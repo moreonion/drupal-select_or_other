@@ -74,6 +74,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   public static function defaultSettings() {
     return [
       'select_element_type' => 'select_or_other_select',
+      'sort_options' => '',
     ] + parent::defaultSettings();
   }
 
@@ -90,6 +91,13 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
       '#default_value' => $this->getSetting('select_element_type'),
     ];
 
+    $form['sort_options'] = [
+      '#title' => $this->t('Sort options by value'),
+      '#type' => 'select',
+      '#options' => $this->sortOptions(),
+      '#default_value' => $this->getSetting('sort_options'),
+    ];
+
     return $form;
   }
 
@@ -101,6 +109,11 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
     $options = $this->selectElementTypeOptions();
     $summary[] = $this->t('Type of select form element') . ': ' . $options[$this->getSetting('select_element_type')];
+
+    if ($option = $this->getSetting('sort_options')) {
+      $options = $this->sortOptions();
+      $summary[] = $options[$option];
+    }
 
     return $summary;
   }
@@ -116,15 +129,37 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $element += [
       '#no_empty_option' => $this->isDefaultValueWidget($form_state),
       '#type' => $this->getSetting('select_element_type'),
-      '#options' => $this->getOptions(),
       '#default_value' => $this->getSelectedOptions($items),
       '#multiple' => $this->isMultiple(),
       '#key_column' => $this->getColumn(),
       '#element_validate' => [[get_class($this), 'validateElement']],
     ];
 
+    $this->addOptionsToElement($element);
+
     // The rest of the $element is built by child method implementations.
     return $element;
+  }
+
+  /**
+   * Adds the available options to the select or other element.
+   *
+   * @param $element
+   *   The select or other form api element to add the options to.
+   */
+  private function addOptionsToElement(&$element) {
+    $element['#options'] = $this->getOptions();
+
+    if ($direction = $this->getSetting('sort_options')) {
+      if ($direction === 'ASC') {
+        uasort($element['#options'], 'strcasecmp');
+      }
+      elseif ($direction === 'DESC') {
+        uasort($element['#options'], function ($a, $b) {
+          return -1 * strcasecmp($a, $b);
+        });
+      }
+    }
   }
 
   /**
@@ -132,6 +167,9 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *
    * @return bool
    *   Whether the element has a value or not.
+   *
+   * @codeCoverageIgnore
+   *   No need to test accessors.
    */
   public function hasValue() {
     return $this->hasValue;
@@ -275,6 +313,24 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     return [
       'select_or_other_select' => $this->t('Select list'),
       'select_or_other_buttons' => $this->t('Radiobuttons/checkboxes'),
+    ];
+  }
+
+  /**
+   * Returns the available sorting options.
+   *
+   * @return array
+   *   The available sorting options.
+   *
+   * @codeCoverageIgnore
+   *   Testing this method would only test if this hard-coded array equals the
+   *   one in the test case.
+   */
+  private function sortOptions() {
+    return [
+      '' => $this->t('No sorting'),
+      'ASC' => $this->t('Sorted ascending'),
+      'DESC' => $this->t('Sorted descending'),
     ];
   }
 

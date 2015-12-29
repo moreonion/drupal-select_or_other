@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls;
 use ReflectionMethod;
 
 /**
@@ -98,11 +99,29 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
     $mock = $this->widgetBaseMock;
     $element_type_options = new ReflectionMethod($this->testedClassName, 'selectElementTypeOptions');
     $element_type_options->setAccessible(TRUE);
+
     $options = $element_type_options->invoke($mock);
+    $element_type_label = '';
     foreach ($options as $option => $label) {
+      $element_type_label = $label;
       $mock->setSetting('select_element_type', $option);
 
       $expected = ['Type of select form element: ' . $label];
+      $summary = $mock->settingsSummary();
+
+      $this->assertArrayEquals($expected, $summary);
+    }
+
+    $sort_options = new ReflectionMethod($this->testedClassName, 'sortOptions');
+    $sort_options->setAccessible(TRUE);
+    $options = $sort_options->invoke($mock);
+    foreach ($options as $option => $label) {
+      $mock->setSetting('sort_options', $option);
+
+      $expected = ['Type of select form element: ' . $element_type_label];
+      if ($option !== '') {
+        $expected[] = $label;
+      }
       $summary = $mock->settingsSummary();
 
       $this->assertArrayEquals($expected, $summary);
@@ -114,13 +133,11 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
    */
   public function testHelperMethods() {
     $storage_stub = $this->getMockForAbstractClass('\Drupal\Core\Field\FieldStorageDefinitionInterface');
-    $storage_stub->expects($this->exactly(2))
-      ->method('isMultiple')->will($this->onConsecutiveCalls(TRUE, FALSE));
-    $this->fieldDefinition->expects($this->exactly(2))
-      ->method('getFieldStorageDefinition')
+    $storage_stub->method('isMultiple')
+      ->will($this->onConsecutiveCalls(TRUE, FALSE));
+    $this->fieldDefinition->method('getFieldStorageDefinition')
       ->willReturn($storage_stub);
-    $this->fieldDefinition->expects($this->exactly(2))
-      ->method('isRequired')
+    $this->fieldDefinition->method('isRequired')
       ->will($this->onConsecutiveCalls(TRUE, FALSE));
 
     $is_multiple = new ReflectionMethod($this->testedClassName, 'isMultiple');
@@ -145,9 +162,8 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->setMethods(['getColumn', 'getOptions'])
       ->getMockForAbstractClass();
-    $mock->expects($this->any())->method('getColumn')->willReturn('id');
-    $mock->expects($this->any())
-      ->method('getOptions')
+    $mock->method('getColumn')->willReturn('id');
+    $mock->method('getOptions')
       ->willReturnOnConsecutiveCalls([], [1 => 1, 2 => 2, 3 => 3]);
 
     // Mock up some entities.
@@ -158,11 +174,9 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
 
     // Put the entities in a mocked list.
     $items = $this->getMockForAbstractClass('Drupal\Core\Field\FieldItemListInterface');
-    $items->expects($this->any())
-      ->method('valid')
+    $items->method('valid')
       ->willReturnOnConsecutiveCalls(TRUE, TRUE, FALSE, TRUE, TRUE, FALSE);
-    $items->expects($this->any())
-      ->method('current')
+    $items->method('current')
       ->willReturnOnConsecutiveCalls($entity1, $entity2, $entity1, $entity2);
 
     // Make getSelectedOptions accessible.
@@ -173,10 +187,109 @@ class SelectOrOtherWidgetBaseTest extends UnitTestCase {
     $selected_options = $get_selected_options->invokeArgs($mock, [$items]);
     $this->assertArrayEquals($expected, $selected_options, 'Selected options without a matching option are filtered out.');
 
-    /** @var SelectOrOtherWidgetBase $mock */
     $expected = [1, 3];
     $selected_options = $get_selected_options->invokeArgs($mock, [$items]);
     $this->assertArrayEquals($expected, $selected_options, 'Selected options with matching options are kept.');
   }
 
+  /**
+   * Make sure the addOptionsToElement adds options as expected.
+   */
+  public function testAddOptions() {
+    // Mock the widget.
+    $mock = $this->getMockBuilder('Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase')
+      ->disableOriginalConstructor()
+      ->setMethods(['getOptions', 'getSetting'])
+      ->getMockForAbstractClass();
+    $mock->method('getOptions')
+      ->willReturnOnConsecutiveCalls([], ['a'], ['a', 'b'], ['key' => 'value']);
+
+    // Make getSelectedOptions accessible.
+    $add_options_to_element = new ReflectionMethod($this->testedClassName, 'addOptionsToElement');
+    $add_options_to_element->setAccessible(TRUE);
+
+    $element = [];
+    $expected = ['#options' => []];
+    $args = [& $element];
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertArrayEquals($expected, $element);
+
+    $expected['#options'] = ['a'];
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertArrayEquals($expected, $element);
+
+    $expected['#options'] = ['a', 'b'];
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertArrayEquals($expected, $element);
+
+    $expected['#options'] = ['key' => 'value'];
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertArrayEquals($expected, $element);
+  }
+
+
+  /**
+   * Make sure the addOptionsToElement method sorts the options properly.
+   */
+  public function testAddOptionsSorting() {
+    $options = ['a', 'z', 'k'];
+    // Mock the widget.
+    $mock = $this->getMockBuilder('Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase')
+      ->disableOriginalConstructor()
+      ->setMethods(['getOptions', 'getSetting'])
+      ->getMockForAbstractClass();
+    $mock->method('getOptions')->willReturn($options);
+    $mock->method('getSetting')
+      ->with('sort_options')
+      ->willReturnCallback(get_class($this) . '::sortOptionsDirectionCallback');
+
+    // Make getSelectedOptions accessible.
+    $add_options_to_element = new ReflectionMethod($this->testedClassName, 'addOptionsToElement');
+    $add_options_to_element->setAccessible(TRUE);
+
+    $element = [];
+    $expected = ['#options' => $options];
+    $args = [& $element];
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertSame($expected, $element, 'Options are unsorted when sorting has not been enabled.');
+
+    $expected['#options'] = $options;
+    uasort($expected['#options'], 'strcasecmp');
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertSame($expected, $element, 'Options are sorted ascending if configured as such.');
+
+    uasort($expected['#options'], function ($a, $b) {
+      return -1 * strcasecmp($a, $b);
+    });
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertSame($expected, $element, 'Options are sorted descending if configured as such.');
+
+    $expected['#options'] = $options;
+    $add_options_to_element->invokeArgs($mock, $args);
+    $this->assertSame($expected, $element, 'Options are unsorted when an invalid direction was passed.');
+  }
+
+  /**
+   * Callback for dummy sort options settings.
+   *
+   * @return string
+   */
+  public static function sortOptionsDirectionCallback() {
+    static $count;
+    $count++;
+
+    switch ($count) {
+      case 1:
+        return '';
+
+      case 2:
+        return 'ASC';
+
+      case 3:
+        return 'DESC';
+    }
+
+    $count = 0;
+    return 'invalid direction';
+  }
 }
