@@ -137,6 +137,25 @@ namespace Drupal\Tests\select_or_other\Unit {
 
     }
 
+    /**
+     * Tests the processing of form API #state .
+     */
+    public function testPrepareState() {
+      // Test ElementBase.
+      // Make the protected method accessible and invoke it.
+      $method = new ReflectionMethod('Drupal\select_or_other\Element\ElementBase', 'prepareState');
+      $method->setAccessible(TRUE);
+
+      $result = $method->invoke(null, 'state', 'name', 'key', 'value');
+      $expected = [
+        'state' => [
+          ':input[name="name"]' => ['key' => 'value'],
+        ],
+      ];
+
+      $this->assertArrayEquals($expected, $result);
+    }
+
   }
 }
 
