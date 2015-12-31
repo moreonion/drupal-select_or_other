@@ -8,7 +8,7 @@ namespace Drupal\Tests\select_or_other\Unit;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormState;
-use Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget;
+use Drupal\select_or_other\Plugin\Field\FieldWidget\ReferenceWidget;
 use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit_Framework_MockObject_MockBuilder;
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @group select_or_other
  *
- * @covers Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget
+ * @covers Drupal\select_or_other\Plugin\Field\FieldWidget\ReferenceWidget
  */
 class ReferenceWidgetTest extends UnitTestCase {
 
@@ -38,7 +38,7 @@ class ReferenceWidgetTest extends UnitTestCase {
    */
   protected function setUp() {
     parent::setUp();
-    $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget';
+    $this->testedClassName = 'Drupal\select_or_other\Plugin\Field\FieldWidget\ReferenceWidget';
     $container_class = 'Drupal\Core\DependencyInjection\Container';
     $methods = get_class_methods($container_class);
     /** @var ContainerInterface $container */

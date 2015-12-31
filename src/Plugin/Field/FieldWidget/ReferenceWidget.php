@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference\ReferenceWidget.
+ * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\ReferenceWidget.
  */
 
-namespace Drupal\select_or_other\Plugin\Field\FieldWidget\EntityReference;
+namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
