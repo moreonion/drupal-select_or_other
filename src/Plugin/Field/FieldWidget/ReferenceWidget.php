@@ -218,9 +218,12 @@ class ReferenceWidget extends WidgetBase {
    */
   public static function isApplicable(FieldDefinitionInterface $field_definition) {
     $options = $field_definition->getSettings();
+    $handler_settings = isset($options['handler_settings']) ? $options['handler_settings'] : NULL;
     $handler = \Drupal::service('plugin.manager.entity_reference_selection')
       ->getInstance($options);
-    return $handler instanceof SelectionWithAutocreateInterface && $options['handler_settings']['auto_create'];
+    return $handler instanceof SelectionWithAutocreateInterface
+    && isset($handler_settings['auto_create'])
+    && $handler_settings['auto_create'];
   }
 
 }

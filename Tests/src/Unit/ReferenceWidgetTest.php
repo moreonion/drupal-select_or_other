@@ -209,9 +209,11 @@ class ReferenceWidgetTest extends UnitTestBase {
     $entity_reference_selection = $this->getMockBuilder('Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManager')
       ->disableOriginalConstructor()
       ->getMock();
-    $entity_reference_selection->expects($this->exactly(2))
+    $entity_reference_selection->expects($this->exactly(4))
       ->method('getInstance')
       ->willReturnOnConsecutiveCalls(
+        $this->getMockForAbstractClass('Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface'),
+        $this->getMockForAbstractClass('Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface'),
         $this->getMockForAbstractClass('Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface'),
         $this->getMockForAbstractClass('Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface')
       );
@@ -219,10 +221,17 @@ class ReferenceWidgetTest extends UnitTestBase {
 
     $definition = $this->getMockBuilder('Drupal\Core\Field\FieldDefinitionInterface')
       ->getMockForAbstractClass();
-    $definition->expects($this->exactly(2))
+    $definition->expects($this->exactly(4))
       ->method('getSettings')
-      ->willReturn(['handler_settings' => ['auto_create' => TRUE]]);
+      ->willReturnOnConsecutiveCalls(
+        [],
+        [],
+        ['handler_settings' => ['auto_create' => TRUE]],
+        ['handler_settings' => ['auto_create' => TRUE]]
+      );
     /** @var \Drupal\Core\Field\FieldDefinitionInterface $definition */
+    $this->assertFalse(ReferenceWidget::isApplicable($definition));
+    $this->assertFalse(ReferenceWidget::isApplicable($definition));
     $this->assertFalse(ReferenceWidget::isApplicable($definition));
     $this->assertTrue(ReferenceWidget::isApplicable($definition));
   }
