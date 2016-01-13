@@ -2,14 +2,13 @@
 
 /**
  * @file
- * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase.
+ * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\WidgetBase.
  */
 
 namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
-use Drupal\Component\Utility\Xss;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -22,10 +21,7 @@ use Drupal\Core\Form\FormStateInterface;
  *
  * @see \Drupal\Core\TypedData\AllowedValuesInterface
  */
-abstract class SelectOrOtherWidgetBase extends WidgetBase {
-
-  /* @var bool $hasValue */
-  private $hasValue;
+abstract class WidgetBase extends \Drupal\Core\Field\WidgetBase {
 
   /**
    * Helper method to determine the identifying column for the field.
@@ -94,7 +90,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $form['sort_options'] = [
       '#title' => $this->t('Sort options by value'),
       '#type' => 'select',
-      '#options' => $this->sortOptions(),
+      '#options' => $this->getAvailableSortOptions(),
       '#default_value' => $this->getSetting('sort_options'),
     ];
 
@@ -111,7 +107,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
     $summary[] = $this->t('Type of select form element') . ': ' . $options[$this->getSetting('select_element_type')];
 
     if ($option = $this->getSetting('sort_options')) {
-      $options = $this->sortOptions();
+      $options = $this->getAvailableSortOptions();
       $summary[] = $options[$option];
     }
 
@@ -122,20 +118,16 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    // Prepare some properties for the child methods to build the actual form
-    // element.
-    $this->hasValue = isset($items[0]->{$this->getColumn()});
-
     $element += [
       '#no_empty_option' => $this->isDefaultValueWidget($form_state),
       '#type' => $this->getSetting('select_element_type'),
       '#default_value' => $this->getSelectedOptions($items),
       '#multiple' => $this->isMultiple(),
       '#key_column' => $this->getColumn(),
-      '#element_validate' => [[get_class($this), 'validateElement']],
     ];
 
-    $this->addOptionsToElement($element);
+    $element['#options'] = $this->getOptions($items->getEntity());
+    $element['#options'] = $this->sortOptions($element['#options']);
 
     // The rest of the $element is built by child method implementations.
     return $element;
@@ -144,75 +136,33 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
   /**
    * Adds the available options to the select or other element.
    *
-   * @param $element
-   *   The select or other form api element to add the options to.
+   * @param $options
+   *   The options to sort.
    */
-  private function addOptionsToElement(&$element) {
-    $element['#options'] = $this->getOptions();
-
+  private function sortOptions($options) {
     if ($direction = $this->getSetting('sort_options')) {
       if ($direction === 'ASC') {
-        uasort($element['#options'], 'strcasecmp');
+        uasort($options, 'strcasecmp');
       }
       elseif ($direction === 'DESC') {
-        uasort($element['#options'], function ($a, $b) {
+        uasort($options, function ($a, $b) {
           return -1 * strcasecmp($a, $b);
         });
       }
     }
-  }
-
-  /**
-   * Return whether $items of formElement method contains any data.
-   *
-   * @return bool
-   *   Whether the element has a value or not.
-   *
-   * @codeCoverageIgnore
-   *   No need to test accessors.
-   */
-  public function hasValue() {
-    return $this->hasValue;
-  }
-
-  /**
-   * Form validation handler for widget elements.
-   *
-   * @param array $element
-   *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form.
-   *
-   * @todo Figure out if the code in this method is still relevant as it is a
-   * legacy of the initial port to d8.
-   */
-  public static function validateElement(array $element, FormStateInterface $form_state) {
-    // Massage submitted form values.
-    // Drupal\Core\Field\WidgetBase::submit() expects values as
-    // an array of values keyed by delta first, then by column, while our
-    // widgets return the opposite.
-    if (is_array($element['#value'])) {
-      $values = array_values($element['#value']);
-    }
-    else {
-      $values = array($element['#value']);
-    }
-
-    // Transpose selections from field => delta to delta => field.
-    $items = array();
-    foreach ($values as $value) {
-      $items[] = array($element['#key_column'] => $value);
-    }
-    $form_state->setValueForElement($element, $items);
+    return $options;
   }
 
   /**
    * Returns the array of options for the widget.
    *
-   * @return array
-   *   The array of available options for the widget.
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity this widget is used for.
+   *
+   * @return array The array of available options for the widget.
+   * The array of available options for the widget.
    */
-  abstract protected function getOptions();
+  abstract protected function getOptions(FieldableEntityInterface $entity = NULL);
 
   /**
    * Determines selected options from the incoming field values.
@@ -234,7 +184,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
 
     if ($selected_options) {
       // We need to check against a flat list of options.
-      $flattened_options = $this->flattenOptions($this->getOptions());
+      $flattened_options = $this->flattenOptions($this->getOptions($items->getEntity()));
 
       foreach ($selected_options as $key => $selected_option) {
         // Remove the option if it does not exist in the options.
@@ -321,7 +271,7 @@ abstract class SelectOrOtherWidgetBase extends WidgetBase {
    *   Testing this method would only test if this hard-coded array equals the
    *   one in the test case.
    */
-  private function sortOptions() {
+  private function getAvailableSortOptions() {
     return [
       '' => $this->t('No sorting'),
       'ASC' => $this->t('Sorted ascending'),

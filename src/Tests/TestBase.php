@@ -100,10 +100,8 @@ abstract class TestBase extends WebTestBase {
    *   The widget to use.
    * @param array $select_types
    *   Which select elements should be used.
-   * @param array $widget_settings
-   *   The widget settings.
    */
-  protected function prepareTestFields($field_type, array $field_settings, $widget, array $select_types, array $widget_settings) {
+  protected function prepareTestFields($field_type, array $field_settings, $widget, array $select_types) {
     // Configure fields.
     foreach ($select_types as $select_type) {
       foreach (array(1, -1) as $cardinality) {
@@ -120,11 +118,13 @@ abstract class TestBase extends WebTestBase {
             'vocabulary' => strtolower($vocabulary),
           ];
 
-          // Create a vocabulary.
-          \Drupal::entityTypeManager()
-            ->getStorage('taxonomy_vocabulary')
-            ->create(['vid' => strtolower($vocabulary), 'name' => $vocabulary])
-            ->save();
+          if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
+            // Create a vocabulary.
+            \Drupal::entityTypeManager()
+              ->getStorage('taxonomy_vocabulary')
+              ->create(['vid' => strtolower($vocabulary), 'name' => $vocabulary])
+              ->save();
+          }
 
           // Create the field.
           $field_defaults = [

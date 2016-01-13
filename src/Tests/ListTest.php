@@ -15,22 +15,22 @@ namespace Drupal\select_or_other\Tests;
  *
  * @group 'Select or other'
  */
-class ReferenceTest extends TestBase {
+class ListTest extends TestBase {
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'taxonomy', 'select_or_other'];
+  public static $modules = ['node', 'options', 'select_or_other'];
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $field_settings = ['target_type' => 'taxonomy_term'];
-    $widget = 'select_or_other_reference';
+    $field_settings = [];
+    $widget = 'select_or_other_list';
     $widgets = ['select_or_other_select', 'select_or_other_buttons'];
-    $this->prepareTestFields('entity_reference', $field_settings, $widget, $widgets);
+    $this->prepareTestFields('list_string', $field_settings, $widget, $widgets);
     $user = $this->drupalCreateUser($this->defaultPermissions);
     $this->drupalLogin($user);
   }

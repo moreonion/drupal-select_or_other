@@ -10,10 +10,10 @@ use Drupal\Component\Utility\Tags;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
 use Drupal\Core\Entity\Entity;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\select_or_other\Plugin\Field\FieldWidget\SelectOrOtherWidgetBase;
 use Drupal\user\EntityOwnerInterface;
 
 /**
@@ -28,7 +28,7 @@ use Drupal\user\EntityOwnerInterface;
  *   multiple_values = TRUE
  * )
  */
-class ReferenceWidget extends SelectOrOtherWidgetBase {
+class ReferenceWidget extends WidgetBase {
 
   /**
    * Helper method which prepares element values for validation.
@@ -81,7 +81,7 @@ class ReferenceWidget extends SelectOrOtherWidgetBase {
   /**
    * {@inheritdoc}
    */
-  protected function getOptions() {
+  protected function getOptions(FieldableEntityInterface $entity = NULL) {
     $options = [];
 
     // Prepare properties to use for loading.
