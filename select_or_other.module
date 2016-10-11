@@ -190,6 +190,8 @@ function select_or_other_element_process($element, &$form_state) {
     $element['other']['#size'] = $element['#other_size'];
   }
 
+  drupal_alter('select_or_other_process', $element, $form_state, $context);
+
   return $element;
 }
 
