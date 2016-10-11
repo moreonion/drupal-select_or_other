@@ -257,7 +257,7 @@ abstract class WidgetBase extends \Drupal\Core\Field\WidgetBase {
   private function selectElementTypeOptions() {
     return [
       'select_or_other_select' => $this->t('Select list'),
-      'select_or_other_buttons' => $this->t('Radiobuttons/checkboxes'),
+      'select_or_other_buttons' => $this->t('Check boxes/radio buttons'),
     ];
   }
 
