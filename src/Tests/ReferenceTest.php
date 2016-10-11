@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\select_or_other\Tests\ReferenceTest.
- */
-
 namespace Drupal\select_or_other\Tests;
 
 /**

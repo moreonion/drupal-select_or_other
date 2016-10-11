@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\select_or_other\Plugin\Field\FieldWidget\WidgetBase.
- */
-
 namespace Drupal\select_or_other\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\FieldableEntityInterface;

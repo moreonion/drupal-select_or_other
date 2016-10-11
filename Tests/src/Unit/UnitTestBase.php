@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\Tests\select_or_other\Unit\UnitTestBase.
- */
 
 namespace Drupal\Tests\select_or_other\Unit {
 

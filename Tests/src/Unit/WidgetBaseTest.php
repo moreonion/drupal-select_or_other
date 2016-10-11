@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Tests for the WidgetBase class.
- */
 
 namespace Drupal\tests\select_or_other\Unit;
 

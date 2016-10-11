@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains unit tests for the ListWidget.
- */
 
 namespace Drupal\Tests\select_or_other\Unit;
 

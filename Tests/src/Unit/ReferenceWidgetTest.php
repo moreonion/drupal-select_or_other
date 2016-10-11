@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains unit tests for the ReferenceWidget.
- */
 
 namespace Drupal\Tests\select_or_other\Unit;
 
