@@ -41,6 +41,7 @@ class SelectOrOtherAdminTestCase extends SelectOrOtherTestBase {
         'edit own page content',
         'administer content types',
         'administer site configuration',
+        'administer fields',
       )
     );
     $this->drupalLogin($this->adminUser);
