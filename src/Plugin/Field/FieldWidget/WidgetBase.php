@@ -172,7 +172,10 @@ abstract class WidgetBase extends \Drupal\Core\Field\WidgetBase {
     $selected_options = [];
 
     foreach ($items as $item) {
-      $selected_options[] = $item->{$this->getColumn()};
+      $column = $this->getColumn();
+      if ($value = $item->get($column)->getValue()) {
+        $selected_options[] = $value;
+      }
     }
 
     $selected_options = $this->prepareSelectedOptions($selected_options);
