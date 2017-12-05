@@ -81,6 +81,7 @@ function select_or_other_taxonomy_field_widget_form(&$form, &$form_state, $field
       break;
   }
 
+  $element['#other_disable'] = !select_or_other_taxonomy_enable_other($instance, $field);
   return $element;
 }
 
@@ -202,4 +203,14 @@ function select_or_other_taxonomy_validate($element, &$form_state) {
 
   form_set_value($element, $terms, $form_state);
 
+}
+
+/**
+ * Check if "other" option should be enabled
+ */
+function select_or_other_taxonomy_enable_other($instance, $field) {
+  if ($field['type'] == 'taxonomy_term_reference') {
+    $vocabulary = taxonomy_vocabulary_machine_name_load($field['settings']['allowed_values'][0]['vocabulary']);
+    return user_access('edit terms in ' . $vocabulary->vid) || user_access('administer taxonomy') || (module_exists('taxonomy_access_fix') && user_access('add terms in ' . $vocabulary->machine_name));
+  }
 }
