@@ -1,18 +1,17 @@
 <?php
 
-namespace Drupal\select_or_other\Tests;
+namespace Drupal\Tests\select_or_other\Functional;
 
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Base test class for select or other widgets.
- *
- * @codeCoverageIgnore
- *   Our unit tests do not have to cover the integration tests.
  */
-abstract class TestBase extends WebTestBase {
+abstract class TestBase extends BrowserTestBase {
 
-  /* @var array $defaultPermissions */
+  /*
+   * @var array $defaultPermissions
+   */
   protected $defaultPermissions;
 
   /**
@@ -27,8 +26,10 @@ abstract class TestBase extends WebTestBase {
    */
   protected $fields;
 
-  /* @var array $modules */
-  public static $modules = ['block', 'select_or_other'];
+  /*
+   * @var array $modules
+   */
+  public static $modules = ['block', 'select_or_other', 'taxonomy', 'node'];
 
   /**
    * {@inheritdoc}

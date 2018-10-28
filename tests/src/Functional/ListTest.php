@@ -1,31 +1,28 @@
 <?php
 
-namespace Drupal\select_or_other\Tests;
+namespace Drupal\Tests\select_or_other\Functional;
 
 /**
  * Tests the the functionality of the Reference widget.
  *
- * @codeCoverageIgnore
- *   Our unit tests do not have to cover the integration tests.
- *
- * @group Select or other
+ * @group select_or_other
  */
-class ReferenceTest extends TestBase {
+class ListTest extends TestBase {
 
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['node', 'taxonomy', 'select_or_other'];
+  public static $modules = ['options'];
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $field_settings = ['target_type' => 'taxonomy_term'];
-    $widget = 'select_or_other_reference';
+    $field_settings = [];
+    $widget = 'select_or_other_list';
     $widgets = ['select_or_other_select', 'select_or_other_buttons'];
-    $this->prepareTestFields('entity_reference', $field_settings, $widget, $widgets);
+    $this->prepareTestFields('list_string', $field_settings, $widget, $widgets);
     $user = $this->drupalCreateUser($this->defaultPermissions);
     $this->drupalLogin($user);
   }
