@@ -8,4 +8,6 @@ files[] = tests/select_or_other_number.test
 files[] = tests/select_or_other_text.test
 files[] = tests/SelectOrOtherTestBase.test
 
+dependencies[] = jquery_update:jquery_update
+
 test_dependencies[] = i18n

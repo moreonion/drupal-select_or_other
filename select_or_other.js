@@ -4,24 +4,6 @@
 
 (function ($) {
 
-  // Helper functions for jQuery < 1.5 compatibilty.
-  if ($.fn.prop) {
-    var setProp = function($e, prop) {
-      $e.prop(prop, true);
-    };
-    var removeProp = function($e, prop) {
-      $e.prop(prop, false);
-    }
-  }
-  else {
-    var setProp = function($e, prop) {
-      $e.attr(prop, prop);
-    };
-    var removeProp = function($e, prop) {
-      $e.removeAttr(prop);
-    }
-  }
-
   function bind($wrapper) {
     var multiple = $wrapper.is('.select-or-other-multiple');
     var $other_element = $wrapper.find('.select-or-other-other').closest('.form-item');
@@ -48,7 +30,7 @@
     };
 
     if (other_selected()) {
-      setProp($other_input, 'required');
+      $other_input.prop('required', true);
     }
     else {
       $other_element.hide();
@@ -59,14 +41,14 @@
 
     var update = function () {
       if (other_selected()) {
-        setProp($other_input, 'required');
+        $other_input.prop('required', true);
         $other_element.show(speed, function() {
           $other_element.find('.select-or-other-other').focus();
         });
       }
       else {
         $other_element.hide(speed);
-        removeProp($other_input, 'required');
+        $other_input.prop('required', false);
       }
     }
     $select_element.not('select').click(update);
@@ -83,14 +65,14 @@
         values = [values];
       }
       var prop = $select_element.is('select') ? 'selected' : 'checked';
-      removeProp($select_element.find('option, input'), prop);
+      $select_element.find('option, input').prop(prop, false);
       values.forEach(function (value) {
         var $e = $select_element.find('[value="' + value + '"]');
         if (!$e.length) {
           $e = $other_option;
           $other_input.val(value);
         }
-        setProp($e, prop);
+        $e.prop(prop, true);
       });
       update();
     });
