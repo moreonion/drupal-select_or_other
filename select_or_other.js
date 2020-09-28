@@ -4,6 +4,35 @@
 
 (function ($) {
 
+  // Make .val() work on our .select-or-other wrappers.
+  var original = null;
+  if (typeof $.valHooks === 'undefined') {
+    $.valHooks = {};
+  }
+  if (typeof $.valHooks !== 'undefined' && typeof $.valHooks.div !== 'undefined') {
+    original = $.valHooks.div;
+  }
+  $.valHooks.div = {
+    get: function (elem) {
+      var obj = $(elem).data('selectOrOther');
+      if (obj) {
+        return obj.get();
+      }
+      if (original && original.get) {
+        return original.get(elem);
+      }
+    },
+    set: function (elem, value) {
+      var obj = $(elem).data('selectOrOther');
+      if (obj) {
+        return obj.set(value);
+      }
+      if (original && original.set) {
+        return original.set(elem, value);
+      }
+    }
+  };
+
   function bind($wrapper) {
     var multiple = $wrapper.is('.select-or-other-multiple');
     var $other_element = $wrapper.find('.select-or-other-other').closest('.form-item');
@@ -60,21 +89,24 @@
       });
     });
 
-    $wrapper.bind('select-or-other-set', function(event, values) {
-      if (typeof values == 'string') {
-        values = [values];
-      }
-      var prop = $select_element.is('select') ? 'selected' : 'checked';
-      $select_element.find('option, input').prop(prop, false);
-      values.forEach(function (value) {
-        var $e = $select_element.find('[value="' + value + '"]');
-        if (!$e.length) {
-          $e = $other_option;
-          $other_input.val(value);
+    $wrapper.data('selectOrOther', {
+      get: get_value,
+      set: function(values) {
+        if (typeof values == 'string') {
+          values = [values];
         }
-        $e.prop(prop, true);
-      });
-      update();
+        var prop = $select_element.is('select') ? 'selected' : 'checked';
+        $select_element.find('option, input').prop(prop, false);
+        values.forEach(function (value) {
+          var $e = $select_element.find('[value="' + value + '"]');
+          if (!$e.length) {
+            $e = $other_option;
+            $other_input.val(value);
+          }
+          $e.prop(prop, true);
+        });
+        update();
+      }
     });
   }
 
