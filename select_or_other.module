@@ -26,8 +26,9 @@ function select_or_other_theme() {
  */
 function theme_select_or_other($variables) {
   $element = $variables['element'];
+  $value_class = $element['#multiple'] ? 'select-or-other-multiple' : 'select-or-other-single';
 
-  $output = "<div class=\"select-or-other\">\n";
+  $output = "<div class=\"select-or-other $value_class\">\n";
   $output .= drupal_render_children($element) . "\n";
   $output .= "</div>\n";
   return $output;
