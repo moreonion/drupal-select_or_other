@@ -45,19 +45,6 @@
       return $other_option.is(':selected, :checked');
     };
 
-    var get_value = multiple ? function() {
-      var selected = [];
-      $select_element.find('select :selected, :checked').not($other_option).each(function () {
-        selected.push($(this).val());
-      });
-      if (other_selected()) {
-        selected.push($other_input.val());
-      }
-      return selected;
-    } : function () {
-      return other_selected() ? $other_input.val() : $select_element.find('select, :checked').val();
-    };
-
     if (other_selected()) {
       $other_input.prop('required', true);
     }
@@ -83,12 +70,26 @@
     $select_element.not('select').click(update);
     $select_element.filter('select').change(update);
     $wrapper.bind('change', function(event, values) {
-      $wrapper.trigger('select-or-other-change', {
-        'multiple': multiple,
-        'value': get_value(),
-      });
+      // Replace change events in the select_or_other with change events on the wrapper.
+      if ($wrapper.is(event.target)) {
+        return;
+      }
+      event.stopPropagation();
+      $wrapper.trigger('change');
     });
 
+    var get_value = multiple ? function() {
+      var selected = [];
+      $select_element.find('select :selected, :checked').not($other_option).each(function () {
+        selected.push($(this).val());
+      });
+      if (other_selected()) {
+        selected.push($other_input.val());
+      }
+      return selected;
+    } : function () {
+      return other_selected() ? $other_input.val() : $select_element.find('select, :checked').val();
+    };
     $wrapper.data('selectOrOther', {
       get: get_value,
       set: function(values) {
