@@ -50,9 +50,6 @@
     }
     else {
       $other_element.hide();
-      // Special case, when the page is loaded, also apply 'display: none' in case it is
-      // nested inside an element also hidden by jquery - such as a collapsed fieldset.
-      $other_element.css('display', 'none');
     }
 
     var update = function () {
