@@ -34,12 +34,15 @@
   };
 
   function bind($wrapper) {
+    var hide_other = $wrapper.data('selectOrOtherHide');
+    hide_other = hide_other && hide_other !== '0' && hide_other !== 'false' || hide_other == undefined;
     var multiple = $wrapper.is('.select-or-other-multiple');
     var $other_element = $wrapper.find('.select-or-other-other').closest('.form-item');
     var $other_input = $other_element.find('input');
     var $select_element = $wrapper.find('.select-or-other-select');
     var $other_option = $select_element.find('[value=select_or_other]');
     var speed = 200;
+    var prop = $select_element.is('select') ? 'selected' : 'checked';
 
     var other_selected = function() {
       return $other_option.is(':selected, :checked');
@@ -48,24 +51,37 @@
     if (other_selected()) {
       $other_input.prop('required', true);
     }
-    else {
+    else if (hide_other) {
       $other_element.hide();
     }
 
-    var update = function () {
+    var triggerUpdate = function () {
+      $wrapper.triggerHandler('select-or-other-update');
+    };
+    var updateRequired = function () {
+      $other_input.prop('required', other_selected());
+    };
+    var updateVisibility = function () {
       if (other_selected()) {
-        $other_input.prop('required', true);
         $other_element.show(speed, function() {
           $other_element.find('.select-or-other-other').focus();
         });
       }
       else {
         $other_element.hide(speed);
-        $other_input.prop('required', false);
       }
+    };
+    $select_element.not('select').click(triggerUpdate);
+    $select_element.change(triggerUpdate);
+    $wrapper.on('select-or-other-update', updateRequired);
+    if (hide_other) {
+      $wrapper.on('select-or-other-update', updateVisibility);
     }
-    $select_element.not('select').click(update);
-    $select_element.filter('select').change(update);
+    else {
+      $other_input.on('click', function () {
+        $other_option.prop(prop, true).trigger('change');
+      });
+    }
     $wrapper.bind('change', function(event, values) {
       // Replace change events in the select_or_other with change events on the wrapper.
       if ($wrapper.is(event.target)) {
@@ -93,7 +109,6 @@
         if (typeof values == 'string') {
           values = [values];
         }
-        var prop = $select_element.is('select') ? 'selected' : 'checked';
         $select_element.find('option, input').prop(prop, false);
         values.forEach(function (value) {
           var $e = $select_element.find('[value="' + value + '"]');
@@ -103,7 +118,7 @@
           }
           $e.prop(prop, true);
         });
-        update();
+        triggerUpdate();
       }
     });
   }
