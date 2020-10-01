@@ -113,9 +113,9 @@
           var $e = $select_element.find('[value="' + value + '"]');
           if (!$e.length) {
             $e = $other_option;
-            $other_input.val(value);
+            $other_input.val(value).trigger('change');
           }
-          $e.prop(prop, true);
+          $e.prop(prop, true).trigger('change');
         });
         triggerUpdate();
       }
