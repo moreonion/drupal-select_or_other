@@ -54,27 +54,25 @@
       };
       $wrapper.triggerHandler('select-or-other-update', data);
     };
-    var updateRequired = function (event, data) {
-      $other_input.prop('required', data.otherSelected);
-    };
-    var updateVisibility = function (event, data) {
-      var speed = data.userInput ? 200 : 0;
-      if (data.otherSelected) {
-        $other_element.show(speed, function() {
-          if (data.userInput) {
-            $other_input.focus();
-          }
-        });
-      }
-      else {
-        $other_element.hide(speed);
-      }
-    };
     $select_element.not('select').click(triggerUpdate);
     $select_element.change(triggerUpdate);
-    $wrapper.on('select-or-other-update', updateRequired);
+    $wrapper.on('select-or-other-update', function (event, data) {
+      $other_input.prop('required', data.otherSelected);
+    });
     if (hide_other) {
-      $wrapper.on('select-or-other-update', updateVisibility);
+      $wrapper.on('select-or-other-update', function (event, data) {
+        var speed = data.userInput ? 200 : 0;
+        if (data.otherSelected) {
+          $other_element.show(speed, function() {
+            if (data.userInput) {
+              $other_input.focus();
+            }
+          });
+        }
+        else {
+          $other_element.hide(speed);
+        }
+      });
     }
     else {
       $other_input.on('click', function () {
