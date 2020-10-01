@@ -41,30 +41,26 @@
     var $other_input = $other_element.find('input');
     var $select_element = $wrapper.find('.select-or-other-select');
     var $other_option = $select_element.find('[value=select_or_other]');
-    var speed = 200;
     var prop = $select_element.is('select') ? 'selected' : 'checked';
 
     var other_selected = function() {
       return $other_option.is(':selected, :checked');
     };
 
-    if (other_selected()) {
-      $other_input.prop('required', true);
-    }
-    else if (hide_other) {
-      $other_element.hide();
-    }
-
-    var triggerUpdate = function () {
-      $wrapper.triggerHandler('select-or-other-update');
+    var triggerUpdate = function (event) {
+      var data = {'userInput': typeof event != 'undefined'};
+      $wrapper.triggerHandler('select-or-other-update', data);
     };
     var updateRequired = function () {
       $other_input.prop('required', other_selected());
     };
-    var updateVisibility = function () {
+    var updateVisibility = function (event, data) {
+      var speed = data.userInput ? 200 : 0;
       if (other_selected()) {
         $other_element.show(speed, function() {
-          $other_element.find('.select-or-other-other').focus();
+          if (data.userInput) {
+            $other_input.focus();
+          }
         });
       }
       else {
@@ -121,6 +117,8 @@
         triggerUpdate();
       }
     });
+    // Initial update of the elements.
+    triggerUpdate();
   }
 
   /**
