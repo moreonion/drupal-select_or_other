@@ -58,6 +58,7 @@
     $select_element.change(triggerUpdate);
     $wrapper.on('select-or-other-update', function (event, data) {
       $other_input.prop('required', data.otherSelected);
+      $wrapper.toggleClass('select-or-other-checked', data.otherSelected);
     });
     if (hide_other) {
       $wrapper.on('select-or-other-update', function (event, data) {
