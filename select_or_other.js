@@ -48,15 +48,18 @@
     };
 
     var triggerUpdate = function (event) {
-      var data = {'userInput': typeof event != 'undefined'};
+      var data = {
+        'userInput': typeof event != 'undefined',
+        'otherSelected': other_selected(),
+      };
       $wrapper.triggerHandler('select-or-other-update', data);
     };
-    var updateRequired = function () {
-      $other_input.prop('required', other_selected());
+    var updateRequired = function (event, data) {
+      $other_input.prop('required', data.otherSelected);
     };
     var updateVisibility = function (event, data) {
       var speed = data.userInput ? 200 : 0;
-      if (other_selected()) {
+      if (data.otherSelected) {
         $other_element.show(speed, function() {
           if (data.userInput) {
             $other_input.focus();
