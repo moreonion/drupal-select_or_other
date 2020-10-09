@@ -207,6 +207,15 @@ function select_or_other_process_form_element(&$variables) {
 }
 
 /**
+ * Prepares variables for theme_webform_element().
+ */
+function select_or_other_process_webform_element(&$variables) {
+  if (isset($variables['element']['#theme']) && $variables['element']['#theme'] === 'select_or_other') {
+    $variables['element']['#title_display'] = 'none';
+  }
+}
+
+/**
  * Element validate callback for a Select (or other) element.
  */
 function select_or_other_element_validate($element, &$form_state) {
