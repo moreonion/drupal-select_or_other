@@ -44,12 +44,16 @@ function select_or_other_element_info() {
       '#select_type' => 'select',
       '#input' => TRUE,
       '#multiple' => FALSE,
+      '#options' => array(),
       '#default_value' => NULL,
       '#process' => array('select_or_other_element_process'),
       '#element_validate' => array('select_or_other_element_validate'),
       '#other' => t('Other'),
+      '#other_unknown_defaults' => 'other',
+      '#other_delimiter' => '',
       '#theme' => 'select_or_other',
       '#theme_wrappers' => array('form_element'),
+      '#attributes' => array(),
     ),
   );
 }
@@ -79,24 +83,20 @@ function select_or_other_element_process($element, &$form_state) {
   // #size, #options, and #attributes are passed to the select box from the
   // main element automatically.
 
-  $element['select'] = array(
-    '#type' => $element['#select_type'],
-    '#title' => $element['#title'],
-    '#title_display' => $element['#title_display'],
-    '#default_value' => $element['#default_value'],
-    '#multiple' => $element['#multiple'],
-    '#required' => $element['#required'],
-    '#size' => isset($element['#size']) ? $element['#size'] : NULL,
-    '#options' => $element['#options'],
-    '#attributes' => $element['#attributes'],
-    '#weight' => 10,
+  $pass = array(
+    '#title',
+    '#title_display',
+    '#default_value',
+    '#multiple',
+    '#required',
+    '#size',
+    '#options',
+    '#attributes',
+    '#empty_option',
+    '#empty_value',
   );
-
-  foreach (array('#empty_option', '#empty_value') as $key) {
-    if (isset($element[$key])) {
-      $element['select'][$key] = $element[$key];
-    };
-  }
+  $element['select'] = array_intersect_key($element, array_flip($pass));
+  $element['select']['#weight'] = 10;
 
   // Remove the default value on the container level so it doesn't get rendered there.
   $element['#value'] = NULL;
@@ -190,9 +190,6 @@ function select_or_other_element_process($element, &$form_state) {
   if (!empty($element['#maxlength'])) {
     $element['other']['#maxlength'] = $element['#maxlength'];
   }
-  if (isset($element['#other_size'])) {
-    $element['other']['#size'] = $element['#other_size'];
-  }
 
   drupal_alter('select_or_other_process', $element, $form_state, $context);
 
@@ -208,6 +205,15 @@ function select_or_other_process_form_element(&$variables) {
     $variables['element']['#theme'] === 'select_or_other'
   ) {
     $variables['element']['#title'] = NULL;
+  }
+}
+
+/**
+ * Prepares variables for theme_webform_element().
+ */
+function select_or_other_process_webform_element(&$variables) {
+  if (isset($variables['element']['#theme']) && $variables['element']['#theme'] === 'select_or_other') {
+    $variables['element']['#title_display'] = 'none';
   }
 }
 
