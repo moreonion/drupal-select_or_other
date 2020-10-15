@@ -4,35 +4,124 @@
 
 (function ($) {
 
-  function select_or_other_check_and_show(ele, page_init) {
-    var speed;
-    if (page_init) {
-      speed = 0;
+  // Make .val() work on our .select-or-other wrappers.
+  var original = null;
+  if (typeof $.valHooks === 'undefined') {
+    $.valHooks = {};
+  }
+  if (typeof $.valHooks !== 'undefined' && typeof $.valHooks.div !== 'undefined') {
+    original = $.valHooks.div;
+  }
+  $.valHooks.div = {
+    get: function (elem) {
+      var obj = $(elem).data('selectOrOther');
+      if (obj) {
+        return obj.get();
+      }
+      if (original && original.get) {
+        return original.get(elem);
+      }
+    },
+    set: function (elem, value) {
+      var obj = $(elem).data('selectOrOther');
+      if (obj) {
+        return obj.set(value);
+      }
+      if (original && original.set) {
+        return original.set(elem, value);
+      }
     }
-    else {
-      speed = 200;
-      ele = jQuery(ele).parents(".select-or-other")[0];
-    }
-    var $other_element = jQuery(ele).find(".select-or-other-other").parents("div.form-item").first();
+  };
+
+  function bind($wrapper) {
+    var hide_other = $wrapper.data('selectOrOtherHide');
+    hide_other = hide_other && hide_other !== '0' && hide_other !== 'false' || hide_other == undefined;
+    var multiple = $wrapper.is('.select-or-other-multiple');
+    var $other_element = $wrapper.find('.select-or-other-other').closest('.form-item');
     var $other_input = $other_element.find('input');
-    if (jQuery(ele).find(".select-or-other-select option:selected[value=select_or_other], .select-or-other-select:checked[value=select_or_other]").length) {
-      $.fn.prop ? $other_input.prop('required', true) : $other_input.attr('required', true)
-      $other_element.show(speed, function() {
-        if(!page_init) {
-          $(this).find(".select-or-other-other").focus();
+    var $select_element = $wrapper.find('.select-or-other-select');
+    var $other_option = $select_element.find('[value=select_or_other]');
+    var prop = $select_element.is('select') ? 'selected' : 'checked';
+
+    var other_selected = function() {
+      return $other_option.is(':selected, :checked');
+    };
+
+    var triggerUpdate = function (event) {
+      var data = {
+        'userInput': typeof event !== 'undefined',
+        'otherSelected': other_selected(),
+      };
+      $wrapper.triggerHandler('select-or-other-update', data);
+    };
+    $select_element.not('select').click(triggerUpdate);
+    $select_element.change(triggerUpdate);
+    $wrapper.on('select-or-other-update', function (event, data) {
+      $other_input.prop('required', data.otherSelected);
+      $wrapper.toggleClass('select-or-other-checked', data.otherSelected);
+    });
+    if (hide_other) {
+      $wrapper.on('select-or-other-update', function (event, data) {
+        var speed = data.userInput ? 200 : 0;
+        if (data.otherSelected) {
+          $other_element.show(speed, function() {
+            if (data.userInput) {
+              $other_input.focus();
+            }
+          });
+        }
+        else {
+          $other_element.hide(speed);
         }
       });
     }
     else {
-      $other_element.hide(speed);
-      $.fn.prop ? $other_input.prop('required', false) : $other_input.removeAttr('required');
-      if (page_init)
-      {
-        // Special case, when the page is loaded, also apply 'display: none' in case it is
-        // nested inside an element also hidden by jquery - such as a collapsed fieldset.
-        jQuery(ele).find(".select-or-other-other").parents("div.form-item").first().css("display", "none");
-      }
+      $other_input.on('click', function () {
+        $other_option.prop(prop, true).trigger('change');
+      });
+      $other_option.not('option').closest('.form-item').hide();
     }
+    $wrapper.bind('change', function(event, values) {
+      // Replace change events in the select_or_other with change events on the wrapper.
+      if ($wrapper.is(event.target)) {
+        return;
+      }
+      event.stopPropagation();
+      $wrapper.trigger('change');
+    });
+
+    var get_value = multiple ? function() {
+      var selected = [];
+      $select_element.find('select :selected, :checked').not($other_option).each(function () {
+        selected.push($(this).val());
+      });
+      if (other_selected()) {
+        selected.push($other_input.val());
+      }
+      return selected;
+    } : function () {
+      return other_selected() ? $other_input.val() : $select_element.find('select, :checked').val();
+    };
+    $wrapper.data('selectOrOther', {
+      get: get_value,
+      set: function(values) {
+        if (typeof values === 'string') {
+          values = [values];
+        }
+        $select_element.find('option, input').prop(prop, false);
+        values.forEach(function (value) {
+          var $e = $select_element.find('[value="' + value + '"]');
+          if (!$e.length) {
+            $e = $other_option;
+            $other_input.val(value).trigger('change');
+          }
+          $e.prop(prop, true).trigger('change');
+        });
+        triggerUpdate();
+      }
+    });
+    // Initial update of the elements.
+    triggerUpdate();
   }
 
   /**
@@ -40,19 +129,10 @@
    */
   Drupal.behaviors.select_or_other = {
     attach: function(context) {
-      jQuery(".select-or-other:not('.select-or-other-processed')", context)
+      $(".select-or-other:not('.select-or-other-processed')", context)
         .addClass('select-or-other-processed')
         .each(function () {
-          select_or_other_check_and_show(this, true);
-        });
-      jQuery(".select-or-other-select", context)
-        .not("select")
-        .click(function () {
-          select_or_other_check_and_show(this, false);
-        });
-      jQuery("select.select-or-other-select", context)
-        .change(function () {
-          select_or_other_check_and_show(this, false);
+          bind($(this));
         });
     }
   };
