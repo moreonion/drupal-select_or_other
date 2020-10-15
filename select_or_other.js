@@ -49,7 +49,7 @@
 
     var triggerUpdate = function (event) {
       var data = {
-        'userInput': typeof event != 'undefined',
+        'userInput': typeof event !== 'undefined',
         'otherSelected': other_selected(),
       };
       $wrapper.triggerHandler('select-or-other-update', data);
@@ -105,7 +105,7 @@
     $wrapper.data('selectOrOther', {
       get: get_value,
       set: function(values) {
-        if (typeof values == 'string') {
+        if (typeof values === 'string') {
           values = [values];
         }
         $select_element.find('option, input').prop(prop, false);
