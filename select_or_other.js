@@ -79,7 +79,6 @@
       $other_input.on('click', function () {
         $other_option.prop(prop, true).trigger('change');
       });
-      $other_option.not('option').closest('.form-item').hide();
     }
     $wrapper.bind('change', function(event, values) {
       // Replace change events in the select_or_other with change events on the wrapper.
