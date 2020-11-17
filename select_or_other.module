@@ -243,8 +243,8 @@ function select_or_other_element_validate($element, &$form_state) {
     form_error($element['other'], t('!title field is required.', array('!title' => $element['select']['#title'])));
   }
 
+  form_set_value($element, $value, $form_state);
   if (isset($value)) {
-    form_set_value($element, $value, $form_state);
     $form_state['clicked_button']['#post'][$element['#name']] = $value; // Is this something we should do?
   }
 
